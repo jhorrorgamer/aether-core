@@ -39,24 +39,24 @@ export default function AetherArchive() {
     "[LOG]: ERR_NOT_FOUND: 4_0_4",
     "[LOG]: TYPE_'LOGS'_TO_DECRYPT",
     "[LOG]: TYPE_'WIRE'_TO_SEE_THE_GRID",
-    "[LOG]: ACCELERATION_BREAKS_REALITY"
+    "[LOG]: ACCELERATION_BREAKS_REALITY",
+    "[LOG]: SUBJECT_MARTINEAU_FOUND_IN_SECTOR_7",
+    "[LOG]: THE_MALL_IS_NOT_EMPTY"
   ];
 
   const logDatabase = [
     { type: 'error', text: "[SYSTEM]: FATAL_ERROR in Sector_7. Subject 'Dylon Martineau' has exceeded temporal bounds." },
-    { type: 'admin', user: 'ADMIN_01', text: "He wasn't supposed to stay in the render. Why is the Sora engine keeping Dylon? It's like the architecture is feeding off his presence." },
+    { type: 'admin', user: 'ADMIN_01', text: "He wasn't supposed to stay in the render. Why is the Sora engine keeping Dylon?" },
     { type: 'user', user: 'NULL_RECOVERY', text: "I saw Dylon in Case File 3. He looked at the camera, but his eyes... they weren't digital anymore." },
-    { type: 'admin', user: 'DEPT_CHIEF', text: "Stop the extraction. If we pull Dylon Martineau out now, the entire liminal archive collapses. He's the anchor." },
+    { type: 'admin', user: 'DEPT_CHIEF', text: "Stop the extraction. If we pull Dylon Martineau out now, the entire archive collapses." },
     { type: 'system', text: "[ALERT]: subject_martineau_01 status: LOST_IN_TRANSITION." },
     { type: 'user', user: 'VOICE_09', text: "The mall isn't empty. Dylon is there. He’s been there since the first 2025 generation." },
-    { type: 'admin', user: 'ADMIN_02', text: "We didn't prompt him to be in these videos. The AI is dreaming about Dylon Martineau on its own." },
     { type: 'error', text: "[CRITICAL]: Subject 'Dylon Martineau' found in non-indexed coordinate: NULL_SPACE." }
   ];
 
   const downloadLore = [
     "DECRYPTING: 'THE_MALL_INCIDENT_REPORT'",
     "RETRIEVING: 'MARTINEAU_BRAIN_SCAN_01'",
-    "ERROR: SUBJECT_NOT_FOUND_IN_PHYSICAL_PLANE",
     "WARNING: RENDER_ENGINE_SELF_AWARENESS_DETECTED",
     "LOG: 'HE_IS_THE_CODE_NOW'",
     "RECOVERED: 'SECTOR_7_NULL_COORDINATES'"
@@ -65,7 +65,6 @@ export default function AetherArchive() {
   const audioRef = useRef(null);
   const cursorRef = useRef(null);
   const mousePos = useRef({ x: 0, y: 0 });
-  const idleTimer = useRef(null);
 
   const galleryImages = [
     { src: "image1.png", meta: "SEARCH: CASE_FILE_LEVEL_188" }, 
@@ -81,101 +80,14 @@ export default function AetherArchive() {
 
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  const playWhisper = () => {
-    if (isMuted) return;
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(80, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 3);
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 1.5);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 4);
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.start(); osc.stop(ctx.currentTime + 4);
-    } catch (e) {}
-  };
-
-  const resetIdleTimer = () => {
-    clearTimeout(idleTimer.current);
-    idleTimer.current = setTimeout(() => {
-      if (!isMuted && !activeVideo && !isSecretOpen && !isHiddenOpen) {
-        playWhisper();
-        setIsGlitching(true);
-        setTimeout(() => setIsGlitching(false), 400);
-      }
-    }, 30000);
-  };
-
-  const startDownload = () => {
-    setIsDownloading(true);
-    setDownloadProgress(0);
-    const interval = setInterval(() => {
-      setDownloadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setCapturedData(downloadLore[Math.floor(Math.random() * downloadLore.length)]);
-          setTimeout(() => { setIsDownloading(false); setCapturedData(null); }, 4000);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 100);
-  };
-
-  const handleNeuralSearch = (e) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    const query = searchQuery.toLowerCase();
-    if (query.includes("dylon") || query.includes("martineau") || query.includes("subject")) {
-      setIsCorrupting(true);
-      setTimeout(() => {
-        setIsCorrupting(false);
-        setIsBreached(true);
-        setTimeout(() => setIsBreached(false), 5000);
-      }, 3000);
-    }
-    setSearchQuery("");
-  };
-
+  // Console Surveillance Logic
   useEffect(() => {
-    // SECURITY: Console Honeypot & Shortcuts
-    const handleContextMenu = (e) => e.preventDefault();
-    const handleKeyDown = (e) => {
-      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) || (e.ctrlKey && e.key === "U")) {
-        e.preventDefault();
-        setIsGlitching(true);
-        setTimeout(() => setIsGlitching(false), 200);
-      }
-    };
-
-    // Console Detect
-    const devtools = new Image();
-    Object.defineProperty(devtools, 'id', { get: () => { setIs404(true); setTimeout(() => setIs404(false), 3000); } });
-    console.log('%c', devtools);
-
-    const consoleMessages = [
-      "%c [STABILITY]: Dylon is the render engine. ",
-      "%c [WARNING]: Archive bypass detected. Subject is watching. ",
-      "%c [LOG]: Sector 7 is bleeding into the console. ",
-      "%c [HINT]: TYPE 'WIRE' TO DECRYPT THE GRID. "
-    ];
-
-    let msgIdx = 0;
-    const consoleInterval = setInterval(() => {
-      console.log(consoleMessages[msgIdx % consoleMessages.length], "color: red; background: black; font-weight: bold; border: 1px solid red; padding: 2px;");
-      msgIdx++;
-    }, 10000);
-
-    window.addEventListener("contextmenu", handleContextMenu);
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("contextmenu", handleContextMenu);
-      window.removeEventListener("keydown", handleKeyDown);
-      clearInterval(consoleInterval);
-    };
+    console.log("%c [SYSTEM_NOTICE]: Unauthorized Inspector Access Detected. Monitoring keystrokes... ", "color: yellow; background: black; font-weight: bold; border: 1px solid yellow; padding: 4px;");
+    const devInterval = setInterval(() => {
+      const randomID = Math.random().toString(36).substring(7).toUpperCase();
+      console.log(`%c [TRACE_${randomID}]: Dylon Martineau status remains 'STATIONARY'. `, "color: #444; font-size: 9px;");
+    }, 12000);
+    return () => clearInterval(devInterval);
   }, []);
 
   useEffect(() => {
@@ -200,24 +112,23 @@ export default function AetherArchive() {
       } catch (err) { setDbStatus("offline"); }
     };
     fetchIdeas();
+    const channel = supabase.channel('db').on('postgres_changes', { event: '*', schema: 'public', table: 'ideas' }, (p) => {
+      if (p.eventType === 'INSERT') setSubmittedIdeas(prev => [p.new, ...prev]);
+    }).subscribe();
+    return () => supabase.removeChannel(channel);
   }, []);
 
   useEffect(() => {
     const moveCursor = (e) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
-      resetIdleTimer();
       const hovered = !!e.target.closest('button, a, .clickable, input, textarea, .dead-pixel, img, video');
       if (hovered) cursorRef.current?.classList.add('cursor-hovering');
       else cursorRef.current?.classList.remove('cursor-hovering');
     };
-
     const updateCursor = () => {
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${mousePos.current.x}px, ${mousePos.current.y}px, 0)`;
-      }
+      if (cursorRef.current) cursorRef.current.style.transform = `translate3d(${mousePos.current.x}px, ${mousePos.current.y}px, 0)`;
       requestAnimationFrame(updateCursor);
     };
-
     window.addEventListener("mousemove", moveCursor);
     const animFrame = requestAnimationFrame(updateCursor);
     return () => {
@@ -227,39 +138,55 @@ export default function AetherArchive() {
   }, []);
 
   useEffect(() => {
-    if (!audioRef.current) return;
-    (isMuted || activeVideo || is404 || isSecretOpen || isHiddenOpen) ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
-  }, [isMuted, activeVideo, is404, isSecretOpen, isHiddenOpen]);
-
-  const handleIdeaSubmit = async (e) => {
-    e.preventDefault();
-    if (!userIdea.trim() || dbStatus !== "online") return;
-    await supabase.from('ideas').insert([{ text: userIdea, username: `User_${Math.floor(Math.random() * 900) + 100}` }]);
-    setUserIdea("");
-  };
-
-  const handleDelete = async (id, e) => {
-    if (e.altKey) await supabase.from('ideas').delete().eq('id', id);
-  };
-
-  useEffect(() => {
     const handleKeys = (e) => {
       const buffer = (inputBuffer + e.key.toLowerCase()).slice(-10);
       setInputBuffer(buffer);
       if (buffer.endsWith("eyes")) { setIsEasterEgg(true); setTimeout(() => setIsEasterEgg(false), 5000); }
       if (buffer.endsWith("breach")) { setIsBreached(true); setTimeout(() => setIsBreached(false), 8000); }
-      if (buffer.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
       if (buffer.endsWith("logs")) { setIsLogsOpen(true); }
       if (buffer.endsWith("wire")) { setIsWireframe(!isWireframe); }
+      if (buffer.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
     };
     window.addEventListener("keydown", handleKeys);
     return () => window.removeEventListener("keydown", handleKeys);
   }, [inputBuffer, isWireframe]);
 
+  const startDownload = () => {
+    setIsDownloading(true);
+    setDownloadProgress(0);
+    const interval = setInterval(() => {
+      setDownloadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setCapturedData(downloadLore[Math.floor(Math.random() * downloadLore.length)]);
+          setTimeout(() => { setIsDownloading(false); setCapturedData(null); }, 4000);
+          return 100;
+        }
+        return prev + 5;
+      });
+    }, 100);
+  };
+
+  const handleNeuralSearch = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    if (searchQuery.toLowerCase().includes("dylon") || searchQuery.toLowerCase().includes("martineau")) {
+      setIsCorrupting(true);
+      setTimeout(() => { setIsCorrupting(false); setIsBreached(true); setTimeout(() => setIsBreached(false), 5000); }, 3000);
+    }
+    setSearchQuery("");
+  };
+
+  const handleIdeaSubmit = async (e) => {
+    e.preventDefault();
+    if (!userIdea.trim()) return;
+    await supabase.from('ideas').insert([{ text: userIdea, username: `User_${Math.floor(Math.random() * 900) + 100}` }]);
+    setUserIdea("");
+  };
+
   return (
-    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''} ${isBreached ? 'breach-active' : ''} ${is404 ? 'system-wipe' : ''} ${isWireframe ? 'wireframe-active' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
+    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isBreached ? 'breach-active' : ''} ${is404 ? 'system-wipe' : ''} ${isWireframe ? 'wireframe-active' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
-      {isDownloading && <div className="data-leak-bg" />}
       
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
@@ -273,106 +200,64 @@ export default function AetherArchive() {
             <span className={isBreached ? 'text-red-500' : ''}>{isBreached ? 'SYSTEM_BREACHED' : 'AETHER_CORE_STATION'}</span>
             <span onMouseEnter={() => setHoverSecret("DYLON_M_NULL")} onMouseLeave={() => setHoverSecret("")} className="secret-trigger pointer-events-auto">CREATOR: DYLON MARTINEAU</span>
             <div className="flex flex-col mt-4 gap-2 opacity-60">
-               <motion.span key={currentHint} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-white/40 italic">
-                {hints[currentHint]}
-               </motion.span>
+               <motion.span key={currentHint} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-white/40 italic">{hints[currentHint]}</motion.span>
             </div>
             <div className="dead-pixel pointer-events-auto mt-4 w-1.5 h-1.5 bg-red-600 shadow-[0_0_10px_red]" onClick={(e) => { e.stopPropagation(); setIsSecretOpen(true); }} />
           </div>
-          <button onClick={() => setIsMuted(!isMuted)} className="clickable pointer-events-auto hover:text-white transition-colors">
-            {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
-          </button>
+          <button onClick={() => setIsMuted(!isMuted)} className="clickable pointer-events-auto">{isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}</button>
         </div>
       </div>
 
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
-        <h1 className={`text-[4.5rem] md:text-[9rem] font-black italic mb-2 transition-all tracking-tighter ${isEasterEgg || isBreached ? 'jitter-redacted' : 'text-white/10'}`}>
+        <h1 className={`text-[4.5rem] md:text-[10rem] font-black italic mb-2 tracking-tighter ${isEasterEgg || isBreached ? 'jitter-redacted' : 'text-white/10'}`}>
           {is404 ? "VOID" : (isBreached ? "ACCESS_DENIED" : (isEasterEgg ? "REDACTED" : "AETHER_CORE"))}
         </h1>
 
-        <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-4 text-center max-w-2xl px-6 leading-loose">
-          A digital archive of recovered generative visuals, dreamcore aesthetics, and encrypted short-film sequences. 
-          <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
-        </p>
-
-        <div className="mb-12 text-[10px] tracking-widest text-white/20 uppercase">
-          Status: <span className="corrupted-text">DYLON_IS_THE_RENDER_ENGINE</span>
-        </div>
-
-        <div className="flex gap-8 mb-12">
-          <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest"><MonitorPlay size={14} /> Sora</a>
-          <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest"><Youtube size={14} /> YouTube</a>
-        </div>
-
-        <div className="w-full max-w-xl px-6 mb-12">
+        <div className="w-full max-w-2xl px-6 mb-12">
           <form onSubmit={handleNeuralSearch} className="relative group">
-            <div className="absolute -inset-0.5 bg-red-600/20 blur opacity-0 group-hover:opacity-100 transition duration-1000"></div>
-            <div className="relative flex items-center bg-black border border-white/10 p-2">
-              <span className="text-white/20 text-[10px] ml-2 mr-4 flex items-center gap-2"><ShieldAlert size={12}/> NEURAL_QUERY:</span>
-              <input 
-                type="text" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="SEARCH_ARCHIVE..." 
-                className="bg-transparent border-none outline-none text-[10px] text-white/60 w-full placeholder:text-white/10 uppercase tracking-[0.3em]"
-              />
+            <div className="relative flex items-center bg-black border border-white/10 p-4">
+              <span className="text-white/20 text-[10px] mr-4 flex items-center gap-2"><ShieldAlert size={12}/> NEURAL_QUERY:</span>
+              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="SEARCH_ARCHIVE..." className="bg-transparent border-none outline-none text-[10px] text-white/60 w-full uppercase tracking-[0.3em]" />
             </div>
           </form>
         </div>
 
         <div className="mb-20 flex flex-col items-center">
-          <button onClick={startDownload} disabled={isDownloading} className="flex items-center gap-3 border border-white/20 px-8 py-2 text-[10px] tracking-[0.4em] uppercase hover:bg-white hover:text-black transition-all clickable">
-            <Download size={14} /> {isDownloading ? `EXTRACTING_DATA: ${downloadProgress}%` : "EXTRACT_SUBJECT_DATA"}
+          <button onClick={startDownload} disabled={isDownloading} className="border border-white/20 px-10 py-3 text-[10px] tracking-[0.4em] uppercase hover:bg-white hover:text-black transition-all clickable flex items-center gap-3">
+            <Download size={14} /> {isDownloading ? `EXTRACTING: ${downloadProgress}%` : "EXTRACT_SUBJECT_DATA"}
           </button>
-          
-          <AnimatePresence>
-            {capturedData && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-4 text-red-500 text-[10px] font-bold tracking-widest jitter-redacted">
-                {capturedData}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {capturedData && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-red-500 text-[10px] font-bold jitter-redacted">{capturedData}</motion.div>}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-32">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl px-8 mb-32">
           {soraVideos.map((vid, idx) => (
-            <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
-              <video src={`/${vid}`} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-30 group-hover:opacity-100 transition-all" />
+            <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable shadow-2xl">
+              <video src={`/${vid}`} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-30 group-hover:opacity-100 transition-all duration-700" />
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6 mb-40">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-7xl px-8 mb-40">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group relative clickable" onClick={() => setSelectedImg(img.src)} onMouseEnter={() => setHoverSecret(img.meta)} onMouseLeave={() => setHoverSecret("")}>
-              <img src={`/${img.src}`} className="w-full h-full object-cover opacity-20 group-hover:opacity-100 grayscale hover:grayscale-0 transition-all" />
-              <div className="absolute top-2 right-2 text-[7px] text-white/0 group-hover:text-white/40 transition-opacity font-mono">
-                {img.meta}
-              </div>
+              <img src={`/${img.src}`} className="w-full h-full object-cover opacity-20 group-hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-500" />
+              <div className="absolute top-2 right-2 text-[7px] text-white/0 group-hover:text-white/40 transition-opacity">{img.meta}</div>
             </div>
           ))}
         </div>
 
-        <div className="w-full max-w-4xl px-6">
-           <div className="flex items-center gap-4 mb-8 text-white/20">
-              <MessageSquare size={16} />
-              <h2 className="text-xs uppercase tracking-[.4em]">Broadcast_Feed</h2>
-           </div>
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="md:col-span-1 border border-white/10 p-6 bg-white/[0.02]">
-                <form onSubmit={handleIdeaSubmit} className="flex flex-col gap-4">
-                  <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Submit data..." className="bg-black border border-white/10 p-3 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[120px] resize-none" />
-                  <button type="submit" className="bg-white/5 border border-white/10 py-2 text-[10px] uppercase hover:bg-white hover:text-black transition-all clickable">Transmit</button>
+        <div className="w-full max-w-5xl px-8">
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              <div className="md:col-span-1 border border-white/10 p-8 bg-white/[0.01]">
+                <form onSubmit={handleIdeaSubmit} className="flex flex-col gap-6">
+                  <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Submit data..." className="bg-black border border-white/10 p-4 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[150px] resize-none" />
+                  <button type="submit" className="bg-white/5 border border-white/10 py-3 text-[10px] uppercase hover:bg-white hover:text-black clickable">Transmit</button>
                 </form>
               </div>
-              <div className="md:col-span-2 flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
+              <div className="md:col-span-2 flex flex-col gap-6 max-h-[500px] overflow-y-auto pr-6 custom-scrollbar">
                 {submittedIdeas.map((idea) => (
-                  <div key={idea.id} onClick={(e) => handleDelete(idea.id, e)} className="border-l-2 border-white/5 pl-4 py-2 hover:border-red-600/30 transition-all group clickable">
-                    <div className="flex justify-between text-[8px] text-white/20 mb-1">
-                      <span>{idea.username}</span>
-                      <Trash2 size={8} className="opacity-0 group-hover:opacity-10" />
-                    </div>
-                    <p className="text-[10px] text-white/60 italic font-mono">"{idea.text}"</p>
+                  <div key={idea.id} className="border-l border-white/10 pl-6 py-4 hover:border-red-600/30 transition-all group clickable">
+                    <p className="text-[11px] text-white/50 italic font-mono leading-relaxed">"{idea.text}"</p>
                   </div>
                 ))}
               </div>
@@ -380,11 +265,11 @@ export default function AetherArchive() {
         </div>
       </main>
 
-      <footer className="fixed bottom-0 w-full z-[60] py-3 bg-black border-t border-white/5 overflow-hidden">
-        <div className="flex whitespace-nowrap animate-marquee text-[9px] tracking-[0.4em] uppercase text-white/10">
-          <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
-          <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
-          <span className="mx-12 clickable hover:text-white transition-colors" onClick={() => setIsHiddenOpen(true)}>DYLON MARTINEAU // @JHORRORGAMER</span>
+      <footer className="fixed bottom-0 w-full z-[60] py-4 bg-black border-t border-white/5 overflow-hidden backdrop-blur-md">
+        <div className="flex whitespace-nowrap animate-marquee text-[10px] tracking-[0.5em] uppercase text-white/10">
+          <span className="mx-20">SYSTEM_STABILITY: {isGlitching ? "CRITICAL" : "NOMINAL"}</span>
+          <span className="mx-20 clickable hover:text-white transition-colors" onClick={() => setIsHiddenOpen(true)}>DYLON MARTINEAU // @JHORRORGAMER</span>
+          <span className="mx-20">ENCRYPTED_SIGNAL_STABLE</span>
         </div>
       </footer>
 
@@ -392,18 +277,12 @@ export default function AetherArchive() {
       
       <AnimatePresence>
         {isLogsOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1000] bg-black/95 flex items-center justify-center p-6 font-mono" onClick={() => setIsLogsOpen(false)}>
-            <div className="w-full max-w-2xl border border-white/20 bg-black p-8 shadow-[0_0_50px_rgba(255,255,255,0.05)]" onClick={e => e.stopPropagation()}>
-              <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                <div className="flex items-center gap-2 text-white/50 text-xs"><Terminal size={14} /> ARCHIVE_DECRYPTION_LOGS</div>
-                <X className="text-white/20 hover:text-white clickable" onClick={() => setIsLogsOpen(false)} />
-              </div>
-              <div className="space-y-4 text-[11px] leading-relaxed max-h-[60vh] overflow-y-auto custom-scrollbar pr-4">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1000] bg-black/98 flex items-center justify-center p-6" onClick={() => setIsLogsOpen(false)}>
+            <div className="w-full max-w-3xl border border-white/20 bg-black p-12" onClick={e => e.stopPropagation()}>
+              <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-6 text-xs text-white/50"><Terminal size={16} /> DECRYPTION_LOGS <X className="clickable" onClick={() => setIsLogsOpen(false)} /></div>
+              <div className="space-y-6 text-[12px] max-h-[55vh] overflow-y-auto custom-scrollbar">
                 {randomLogs.map((log, i) => (
-                  <p key={i} className={`${log.type === 'error' ? 'text-red-500/80' : ''} ${log.type === 'system' ? 'text-blue-400/60' : ''} ${log.type === 'admin' || log.type === 'user' ? 'text-white/40' : ''}`}>
-                    {log.user && <span className="text-white/60">[{log.user}]: </span>}
-                    {log.text}
-                  </p>
+                  <p key={i} className={log.type === 'error' ? 'text-red-500' : 'text-white/40'}>{log.text}</p>
                 ))}
               </div>
             </div>
@@ -411,16 +290,16 @@ export default function AetherArchive() {
         )}
 
         {isCorrupting && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[2000] bg-red-950/20 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-none">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[2000] bg-red-950/30 backdrop-blur-md flex flex-col items-center justify-center">
             <div className="corruption-scanner" />
-            <div className="text-red-600 font-black text-4xl animate-pulse mb-4 tracking-[1em]">CORRUPTION_IN_PROGRESS</div>
+            <div className="text-red-600 font-black text-5xl animate-pulse tracking-[1.2em]">CORRUPTING...</div>
           </motion.div>
         )}
 
         {activeVideo && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
             <X className="absolute top-10 right-10 text-white/50 clickable z-[110]" size={32} onClick={() => setActiveVideo(null)} />
-            <div className="vertical-video-container border border-white/10"><video src={`/${activeVideo}`} controls autoPlay loop playsInline className="w-full h-full object-cover" /></div>
+            <div className="vertical-video-container"><video src={`/${activeVideo}`} controls autoPlay loop playsInline className="w-full h-full object-cover" /></div>
           </motion.div>
         )}
 
