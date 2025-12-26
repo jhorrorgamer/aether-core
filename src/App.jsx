@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { X, Maximize2, Youtube, MonitorPlay } from "lucide-react";
+import { X, Youtube, MonitorPlay, Volume2, VolumeX } from "lucide-react";
 
 export default function AetherArchive() {
   const [selectedImg, setSelectedImg] = useState(null);
@@ -10,6 +9,7 @@ export default function AetherArchive() {
   const [isSecretOpen, setIsSecretOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   
   const [audioLevel, setAudioLevel] = useState(0);
   const audioRef = useRef(null);
@@ -18,6 +18,17 @@ export default function AetherArchive() {
 
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
+
+  // --- AUTO-PAUSE MUSIC ON VIDEO ---
+  useEffect(() => {
+    if (audioRef.current) {
+      if (activeVideo || isSecretOpen) {
+        audioRef.current.pause();
+      } else if (!isMuted) {
+        audioRef.current.play().catch(() => {});
+      }
+    }
+  }, [activeVideo, isSecretOpen, isMuted]);
 
   // --- CURSOR ENGINE ---
   useEffect(() => {
@@ -33,7 +44,7 @@ export default function AetherArchive() {
     return () => window.removeEventListener("mousemove", moveCursor);
   }, []);
 
-  // --- AUDIO ENGINE ---
+  // --- AUDIO ANALYSIS ---
   const initAudio = () => {
     if (analyserRef.current) return;
     const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -53,19 +64,28 @@ export default function AetherArchive() {
     update();
   };
 
+  const toggleMute = (e) => {
+    e.stopPropagation();
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    if (audioRef.current) {
+      audioRef.current.muted = newMuted;
+      if (!newMuted) audioRef.current.play();
+    }
+  };
+
   const handleInteraction = () => {
-    audioRef.current?.play().catch(() => {});
+    if (!isMuted) audioRef.current?.play().catch(() => {});
     initAudio();
   };
 
-  // --- EYES EASTER EGG LOGIC ---
   useEffect(() => {
     const handleKeys = (e) => {
       const newBuf = (inputBuffer + e.key.toLowerCase()).slice(-4);
       setInputBuffer(newBuf);
       if (newBuf === "eyes") { 
         setIsEasterEgg(true); 
-        setTimeout(() => setIsEasterEgg(false), 5000); // 5 seconds of glitch
+        setTimeout(() => setIsEasterEgg(false), 5000);
         setInputBuffer("");
       }
     };
@@ -85,35 +105,39 @@ export default function AetherArchive() {
         />
         <div 
           className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} 
-          style={{ filter: isEasterEgg ? 'contrast(1.5) brightness(1.2)' : 'none' }}
         />
         <div className="vhs-filter" />
       </div>
 
-      {/* HUD */}
+      {/* HUD & CONTROLS */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
             <span>STATION: AETHER_CORE</span>
             <span>USER: DYLON_M</span>
             <div 
-              className="dead-pixel pointer-events-auto mt-4 cursor-none w-2 h-2 bg-red-600 shadow-[0_0_10px_red] transition-transform active:scale-90" 
+              className="dead-pixel pointer-events-auto mt-4 cursor-none w-2 h-2 bg-red-600 shadow-[0_0_10px_red]" 
               onClick={(e) => { e.stopPropagation(); setIsSecretOpen(true); }} 
             />
           </div>
-          <div className="text-right">
+          
+          {/* MUTE TOGGLE */}
+          <div className="flex flex-col items-end gap-4 pointer-events-auto">
+            <button onClick={toggleMute} className="clickable transition-colors hover:text-white">
+              {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            </button>
             <span>SYNC: {Math.round(audioLevel * 100)}%</span>
           </div>
         </div>
         <div className="scanline" style={{ opacity: 0.1 + audioLevel * 0.2 }} />
       </div>
 
-      {/* MAIN CONTENT */}
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
         <h1 className={`text-[4.5rem] md:text-[9rem] font-black italic mb-10 transition-all select-none ${isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}>
           {isEasterEgg ? "REDACTED" : "AETHER_CORE"}
         </h1>
 
+        {/* VIDEOS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-20">
           {soraVideos.map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -122,6 +146,7 @@ export default function AetherArchive() {
           ))}
         </div>
 
+        {/* IMAGES */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable" onClick={() => setSelectedImg(img)}>
@@ -131,22 +156,12 @@ export default function AetherArchive() {
         </div>
       </main>
 
-      <footer className="fixed bottom-0 w-full z-[60] py-3 bg-black border-t border-white/5 overflow-hidden">
-        <div className={`flex whitespace-nowrap animate-marquee text-[9px] tracking-[0.4em] uppercase ${isEasterEgg ? 'text-red-600' : 'text-white/10'}`}>
-          <span className="mx-8">{isEasterEgg ? "SYSTEM CORRUPTED" : "AETHER_ARCHIVE // 2025"}</span> • <span className="mx-8">SIGNAL_STRENGTH: {Math.round(audioLevel * 100)}%</span>
-        </div>
-      </footer>
-
+      {/* OVERLAYS */}
       <AnimatePresence>
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
             <X className="absolute top-10 right-10 text-white/50 clickable z-[110]" size={32} onClick={() => setActiveVideo(null)} />
             <video src={`/${activeVideo}`} controls autoPlay className="max-w-4xl w-full border border-white/10" />
-          </motion.div>
-        )}
-        {selectedImg && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-10" onClick={() => setSelectedImg(null)}>
-            <img src={`/${selectedImg}`} className="max-w-full max-h-full border border-white/10" />
           </motion.div>
         )}
         {isSecretOpen && (
@@ -157,7 +172,6 @@ export default function AetherArchive() {
         )}
       </AnimatePresence>
 
-      {/* CURSOR */}
       <div ref={cursorRef} className="custom-cursor">
         <div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" />
       </div>
