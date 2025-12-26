@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { X, Youtube, MonitorPlay, Volume2, VolumeX } from "lucide-react";
+import { X, Youtube, MonitorPlay, Volume2, VolumeX, Terminal, Eye, AlertTriangle } from "lucide-react";
 
 export default function AetherArchive() {
   const [selectedImg, setSelectedImg] = useState(null);
@@ -8,9 +8,9 @@ export default function AetherArchive() {
   const [inputBuffer, setInputBuffer] = useState("");
   const [isSecretOpen, setIsSecretOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
-  const [isHovering, setIsHovering] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [latency, setLatency] = useState({ gemini: "24ms", sora: "102ms" });
+  const [terminalLogs, setTerminalLogs] = useState(["[SYSTEM]: INITIALIZING...", "[LOAD]: VECTORS_STABLE"]);
   
   const [audioLevel, setAudioLevel] = useState(0);
   const audioRef = useRef(null);
@@ -19,6 +19,22 @@ export default function AetherArchive() {
 
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
+
+  // Cryptic log generator
+  useEffect(() => {
+    const messages = [
+      "[WARN]: DATA_LEAK_DETECTED",
+      "[INFO]: SCANNING_VOID...",
+      "[SYSTEM]: UNKNOWN_ENTITY_PRESENT",
+      "[LOG]: MEMORY_FRAGMENT_404",
+      "[VOID]: IT_LOOKS_BACK",
+      "[LOAD]: RECONSTRUCTING_DREAM_STATE"
+    ];
+    const interval = setInterval(() => {
+      setTerminalLogs(prev => [...prev.slice(-4), messages[Math.floor(Math.random() * messages.length)]]);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   // AI Latency Simulator
   useEffect(() => {
@@ -31,7 +47,7 @@ export default function AetherArchive() {
     return () => clearInterval(interval);
   }, []);
 
-  // Music Management (Pauses when video is open)
+  // Music Management
   useEffect(() => {
     if (audioRef.current) {
       if (activeVideo || isSecretOpen) {
@@ -50,7 +66,7 @@ export default function AetherArchive() {
       requestAnimationFrame(() => {
         cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
       });
-      const hovered = !!e.target.closest('button, a, .clickable, .dead-pixel, img, video');
+      const hovered = !!e.target.closest('button, a, .clickable, .dead-pixel, img, video, .hover-trigger');
       if (hovered) cursor.classList.add('cursor-hovering');
       else cursor.classList.remove('cursor-hovering');
     };
@@ -58,7 +74,6 @@ export default function AetherArchive() {
     return () => window.removeEventListener("mousemove", moveCursor);
   }, []);
 
-  // Audio Visualizer Setup
   const initAudio = () => {
     if (analyserRef.current) return;
     const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -117,6 +132,21 @@ export default function AetherArchive() {
         />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
         <div className="vhs-filter" />
+        {/* Grain overlay */}
+        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://media.giphy.com/media/oEI9uWUicLpR36C40h/giphy.gif')] pointer-events-none" />
+      </div>
+
+      {/* Cryptic Terminal Window (Liminal Floating Element) */}
+      <div className="fixed bottom-20 left-10 z-[40] w-64 p-4 border border-white/5 bg-black/40 backdrop-blur-md hidden md:block">
+        <div className="flex items-center gap-2 mb-2 text-white/40">
+          <Terminal size={12} />
+          <span className="text-[8px] tracking-widest uppercase">System_Log</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          {terminalLogs.map((log, i) => (
+            <span key={i} className="text-[7px] text-white/20 font-mono italic">{log}</span>
+          ))}
+        </div>
       </div>
 
       {/* HUD Header */}
@@ -160,31 +190,41 @@ export default function AetherArchive() {
           </a>
         </div>
 
-        <div className="max-w-xl text-center mb-20 px-6">
-          <p className="text-[10px] leading-relaxed text-white/30 uppercase tracking-[0.2em] italic">
+        <div className="max-w-xl text-center mb-20 px-6 group hover-trigger">
+          <p className="text-[10px] leading-relaxed text-white/30 uppercase tracking-[0.2em] italic transition-opacity group-hover:opacity-0">
             "Recovered data from a fragmented reality. This archive serves as a digital vessel for visual experiments, 
-            AI-driven narratives, and the exploration of the uncanny. 
-            Synchronizing with Aether Core... monitoring Sora and Gemini outputs in real-time."
+            AI-driven narratives, and the exploration of the uncanny."
+          </p>
+          {/* Cryptic message revealed on hover */}
+          <p className="absolute left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] text-red-600 uppercase tracking-[0.5em] w-full">
+            THE ARCHIVE IS NOT EMPTY. STOP LOOKING.
           </p>
         </div>
 
+        {/* Sora Creations */}
         <section className="w-full max-w-6xl px-6 mb-32">
           <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2">Sora Creations</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {soraVideos.map((vid, idx) => (
-              <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
-                <video src={`/${vid}`} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-30 group-hover:opacity-100 transition-all" />
+              <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable relative">
+                <video src={`/${vid}`} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-30 group-hover:opacity-100 transition-all scale-[1.01]" />
+                <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 text-[8px] text-white/40">FRAG_{idx}_LOC_UNCERTAIN</div>
               </div>
             ))}
           </div>
         </section>
 
+        {/* Data Logs */}
         <section className="w-full max-w-6xl px-6">
-          <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2">Data Logs</h2>
+          <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2 flex justify-between items-center">
+            <span>Data Logs</span>
+            <span className="text-red-900 animate-pulse text-[8px]">UNAUTHORIZED_ACCESS</span>
+          </h2>
           <div className="grid grid-cols-3 gap-2">
             {galleryImages.map((img, i) => (
-              <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable" onClick={() => setSelectedImg(img)}>
+              <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable relative" onClick={() => setSelectedImg(img)}>
                 <img src={`/${img}`} className="w-full h-full object-cover opacity-20 group-hover:opacity-100 transition-all" />
+                <div className="absolute inset-0 bg-red-900/10 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity" />
               </div>
             ))}
           </div>
@@ -206,7 +246,7 @@ export default function AetherArchive() {
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
             <X className="absolute top-10 right-10 text-white/50 clickable z-[110]" size={32} onClick={() => setActiveVideo(null)} />
-            <video src={`/${activeVideo}`} controls autoPlay className="max-w-4xl w-full border border-white/10" />
+            <video src={`/${activeVideo}`} controls autoPlay className="max-w-4xl w-full border border-white/10 shadow-[0_0_50px_rgba(255,255,255,0.05)]" />
           </motion.div>
         )}
         {selectedImg && (
@@ -222,6 +262,7 @@ export default function AetherArchive() {
         )}
       </AnimatePresence>
 
+      {/* Centered Cursor */}
       <div ref={cursorRef} className="custom-cursor">
         <div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" />
       </div>
