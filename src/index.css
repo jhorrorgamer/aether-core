@@ -2,7 +2,7 @@
 
 /* --- GLOBAL SETTINGS --- */
 * {
-  cursor: none !important; /* Forces the browser to hide the default mouse */
+  cursor: none !important; /* Hides the default system cursor */
 }
 
 html, body {
@@ -14,7 +14,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* --- THE PERFECTED CURSOR --- */
+/* --- THE PERFECTED CROSSHAIR CURSOR --- */
 .custom-cursor {
   position: fixed; 
   top: 0; 
@@ -26,11 +26,11 @@ html, body {
   mix-blend-mode: difference;
   will-change: transform;
   
-  /* Centering Logic: Pulls the box back by half its width/height */
+  /* Centering Logic: Adjusts the box so the lines cross exactly at the mouse point */
   margin-left: -20px; 
   margin-top: -20px;
 
-  /* Start off-screen to prevent flicker on load */
+  /* Off-screen initial position to prevent flash */
   transform: translate3d(-100px, -100px, 0);
 }
 
@@ -63,16 +63,16 @@ html, body {
   transform: translate(-50%, -50%);
 }
 
-/* Cursor reaction on clickable elements */
+/* Red dot glow effect when hovering over links/buttons */
 .custom-cursor.cursor-hovering .cursor-dot {
   background: red;
   box-shadow: 0 0 15px red;
   transform: translate(-50%, -50%) scale(2.5);
 }
 
-/* --- CRYPTIC FEATURES & ANIMATIONS --- */
+/* --- CRYPTIC TRIGGER EFFECTS --- */
 
-/* 404 System Instability */
+/* 404 System Instability (Shake + Desaturation) */
 .screen-shake {
   animation: shake 0.12s infinite !important;
   filter: contrast(2) saturate(0) brightness(1.2) !important;
@@ -86,7 +86,7 @@ html, body {
   100% { transform: translate(2px, -2px); }
 }
 
-/* Redacted/Eyes Text Jitter */
+/* Redacted Mode / Eyes Jitter */
 .jitter-redacted {
   color: #ff0000 !important;
   text-shadow: 4px 0 #00ffff, -4px 0 #ff00ff;
@@ -95,19 +95,15 @@ html, body {
 
 @keyframes jitter {
   0% { transform: translate(0,0); }
-  25% { transform: translate(-2px, 2px); }
-  50% { transform: translate(2px, -2px); }
-  75% { transform: translate(-1px, -1px); }
+  25% { transform: translate(-4px, 2px); }
+  50% { transform: translate(4px, -2px); }
+  75% { transform: translate(-2px, -1px); }
   100% { transform: translate(0,0); }
 }
 
-/* CMD Console Backdrop */
-.backdrop-blur-md {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
+/* --- ATMOSPHERIC LAYERS --- */
 
-/* --- VHS & ATMOSPHERIC OVERLAYS --- */
+/* VHS Scanlines and Color Bleed */
 .vhs-filter {
   position: fixed;
   inset: 0;
@@ -118,6 +114,7 @@ html, body {
   z-index: 5;
 }
 
+/* Moving Scanline Overlay */
 .scanline {
   position: fixed;
   width: 100%;
@@ -133,7 +130,13 @@ html, body {
   to { top: 100vh; }
 }
 
-/* Marquee Footer */
+/* CMD Log Backdrop Blur */
+.backdrop-blur-md {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Footer Marquee Logic */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -144,7 +147,7 @@ html, body {
   width: 200%;
 }
 
-/* --- UI COMPONENTS --- */
+/* --- COMPONENT INTERACTION --- */
 .clickable {
   transition: transform 0.1s ease;
 }
@@ -162,9 +165,4 @@ html, body {
   transform: scale(3);
   background-color: #ff0000;
   box-shadow: 0 0 20px #ff0000;
-}
-
-/* Image/Video Grid Transitions */
-img, video {
-  transition: opacity 0.3s ease, transform 0.3s ease;
 }

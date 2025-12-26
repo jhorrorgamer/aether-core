@@ -18,7 +18,7 @@ export default function AetherArchive() {
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  // Cryptic log generator (The CMD Effect)
+  // CMD Console Logic
   useEffect(() => {
     const messages = ["[WARN]: DATA_LEAK", "[INFO]: SCANNING_VOID...", "[SYSTEM]: ENTITY_DETECTED", "[LOG]: MEMORY_404", "[VOID]: IT_WATCHES"];
     const interval = setInterval(() => {
@@ -27,7 +27,7 @@ export default function AetherArchive() {
     return () => clearInterval(interval);
   }, []);
 
-  // Keyboard Listener
+  // Keyboard Listener for 404 and EYES
   useEffect(() => {
     const handleKeys = (e) => {
       const char = e.key.toLowerCase();
@@ -76,15 +76,14 @@ export default function AetherArchive() {
     <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''}`} onClick={() => audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
 
-      {/* Backgrounds */}
+      {/* Background Layers */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
         <div className="vhs-filter" />
-        <div className="absolute inset-0 opacity-[0.03] bg-[url('https://media.giphy.com/media/oEI9uWUicLpR36C40h/giphy.gif')] pointer-events-none" />
       </div>
 
-      {/* CMD Console Effect (Bottom Left) */}
+      {/* CMD Console */}
       <div className="fixed bottom-20 left-10 z-[40] w-64 p-4 border border-white/5 bg-black/40 backdrop-blur-md hidden md:block pointer-events-none">
         <div className="flex items-center gap-2 mb-2 text-white/40">
           <Terminal size={12} />
@@ -97,7 +96,7 @@ export default function AetherArchive() {
         </div>
       </div>
 
-      {/* HUD */}
+      {/* HUD Headers */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
@@ -119,7 +118,17 @@ export default function AetherArchive() {
           {isEasterEgg ? "REDACTED" : "AETHER_CORE"}
         </h1>
 
-        {/* Cryptic Hover Description */}
+        {/* --- LINKS SECTION (RE-ADDED) --- */}
+        <div className="flex gap-8 mb-10">
+          <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest">
+            <MonitorPlay size={14} /> Sora Profile
+          </a>
+          <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest">
+            <Youtube size={14} /> YouTube
+          </a>
+        </div>
+
+        {/* Cryptic Hover Logic */}
         <div className="max-w-xl text-center mb-20 px-6 group hover-trigger relative">
           <p className="text-[10px] leading-relaxed text-white/30 uppercase tracking-[0.2em] italic transition-opacity group-hover:opacity-0">
             "Recovered data from a fragmented reality. This archive serves as a digital vessel for visual experiments."
@@ -129,7 +138,7 @@ export default function AetherArchive() {
           </p>
         </div>
 
-        {/* Grids */}
+        {/* Video Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-20">
           {soraVideos.map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -137,6 +146,8 @@ export default function AetherArchive() {
             </div>
           ))}
         </div>
+
+        {/* Image Grid */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable" onClick={() => setSelectedImg(img)}>
@@ -146,7 +157,6 @@ export default function AetherArchive() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="fixed bottom-0 w-full z-[60] py-3 bg-black border-t border-white/5 overflow-hidden">
         <div className={`flex whitespace-nowrap animate-marquee text-[9px] tracking-[0.4em] uppercase ${isEasterEgg ? 'text-red-600' : 'text-white/10'}`}>
           <span className="mx-8">DYLON MARTINEAU // @JHORRORGAMER</span> • 
@@ -154,7 +164,6 @@ export default function AetherArchive() {
         </div>
       </footer>
 
-      {/* Cursor */}
       <div ref={cursorRef} className="custom-cursor">
         <div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" />
       </div>
