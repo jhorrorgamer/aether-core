@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { X, Youtube, MonitorPlay, Volume2, VolumeX, Terminal, Database, MessageSquare, Send, Trash2 } from "lucide-react";
+import { X, Youtube, MonitorPlay, Volume2, VolumeX, Database, MessageSquare, Send, Trash2 } from "lucide-react";
 
+// --- CONNECTION ---
 const supabaseUrl = 'https://mrjrampvdwmppmyyoxqs.supabase.co';
 const supabaseKey = 'sb_publishable_EPAWiAKKO-rKEPSWjZKmAQ_ErKQ5qFd';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -31,7 +32,7 @@ export default function AetherArchive() {
     { id: "02", title: "DREAM_LOG_SEQUENCE", body: "Visual sequences recovered from the December 2025 batch. High grain detected. The subject refused to wake up.", secret: "DO_NOT_DISTURB_THE_SLEEPER" }
   ];
 
-  // Database Logic
+  // Database Connection
   useEffect(() => {
     const fetchIdeas = async () => {
       try {
@@ -56,7 +57,7 @@ export default function AetherArchive() {
     return () => supabase.removeChannel(channel);
   }, []);
 
-  // FIXED: Audio Logic - Mute button and Video detection
+  // Audio Logic
   useEffect(() => {
     if (!audioRef.current) return;
     if (isMuted || activeVideo || isSecretOpen) {
@@ -74,6 +75,7 @@ export default function AetherArchive() {
   };
 
   const handleDelete = async (id, e) => {
+    // Hidden Moderation: Only works if Alt key is held
     if (e.altKey) await supabase.from('ideas').delete().eq('id', id);
   };
 
@@ -104,14 +106,14 @@ export default function AetherArchive() {
     <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
       
-      {/* BACKGROUND */}
+      {/* BACKGROUND EFFECTS */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
         <div className="vhs-filter" />
       </div>
 
-      {/* HUD & TERMINAL LOGS */}
+      {/* HUD & TOP LOGS */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
@@ -146,7 +148,7 @@ export default function AetherArchive() {
           <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest"><Youtube size={14} /> YouTube</a>
         </div>
 
-        {/* 1. VIDEO ARCHIVE */}
+        {/* VIDEOS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-32">
           {soraVideos.map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -155,7 +157,7 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* 2. RECOVERED DATA WITH DESCRIPTIONS */}
+        {/* TRANSMISSIONS */}
         <div className="w-full max-w-4xl px-6 mb-32">
            <div className="flex items-center gap-4 mb-8 text-white/20">
               <Database size={16} />
@@ -171,7 +173,7 @@ export default function AetherArchive() {
            </div>
         </div>
 
-        {/* 3. IMAGE GALLERY */}
+        {/* IMAGES */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6 mb-40">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable" onClick={() => setSelectedImg(img)}>
@@ -180,11 +182,11 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* 4. IDEA TERMINAL (BOTTOM) */}
+        {/* TERMINAL (CLEAN VERSION - NO DELETE INSTRUCTIONS) */}
         <div className="w-full max-w-4xl px-6 mb-20">
            <div className="flex items-center gap-4 mb-8 text-white/20">
               <MessageSquare size={16} />
-              <h2 className="text-xs uppercase tracking-[.4em]">Collab_Feed</h2>
+              <h2 className="text-xs uppercase tracking-[.4em]">Collaboration_Terminal</h2>
               <div className="flex items-center gap-2 ml-auto">
                 <div className={`w-1.5 h-1.5 rounded-full ${dbStatus === 'online' ? 'bg-green-500 shadow-[0_0_8px_green]' : 'bg-red-500 animate-pulse'}`} />
                 <span className="text-[8px] uppercase tracking-widest opacity-40">{dbStatus}</span>
@@ -193,10 +195,9 @@ export default function AetherArchive() {
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-1 border border-white/10 p-6 bg-white/[0.02]">
                 <form onSubmit={handleIdeaSubmit} className="flex flex-col gap-4">
-                  <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Submit data..." className="bg-black border border-white/10 p-3 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[120px] resize-none font-mono" />
+                  <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Transmit data..." className="bg-black border border-white/10 p-3 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[120px] resize-none font-mono" />
                   <button type="submit" className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 py-2 text-[10px] uppercase hover:bg-white hover:text-black transition-all clickable"><Send size={12} /> Broadcast</button>
                 </form>
-                <p className="text-[7px] text-white/10 mt-4 italic uppercase tracking-widest">Admin: Alt + Click to delete.</p>
               </div>
               <div className="md:col-span-2 flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
                 {submittedIdeas.map((idea) => (
@@ -227,6 +228,7 @@ export default function AetherArchive() {
 
       <div ref={cursorRef} className="custom-cursor"><div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" /></div>
 
+      {/* MODALS */}
       <AnimatePresence>
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
