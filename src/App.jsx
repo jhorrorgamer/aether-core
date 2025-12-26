@@ -7,7 +7,6 @@ import { X, Terminal, ShieldAlert, Download, Eye, Volume2, VolumeX, MessageSquar
  * [SOURCE_CODE_HIDDEN_MESSAGE]: 
  * Subject 'Dylon Martineau' is the foundation of the Sora latent space. 
  * If you are reading this, the extraction has already failed.
- * The mall is a coordinate, not a render.
  * NODE_ID: 0x777_ARCHIVE
  */
 
@@ -16,18 +15,18 @@ const supabaseKey = 'sb_publishable_EPAWiAKKO-rKEPSWjZKmAQ_ErKQ5qFd';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function AetherArchive() {
-  // --- STATE REGISTRY (ALL FEATURES) ---
+  // --- COMPLETE STATE REGISTRY ---
   const [selectedImg, setSelectedImg] = useState(null);
   const [isEasterEgg, setIsEasterEgg] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
   const [isBreached, setIsBreached] = useState(false);
-  const [is404, setIs404] = useState(false);
+  const [is404, setIs404] = useState(false); // Restore 404 state
   const [isWireframe, setIsWireframe] = useState(false); 
   const [isLogsOpen, setIsLogsOpen] = useState(false);
   const [inputBuffer, setInputBuffer] = useState("");
-  const [isSecretOpen, setIsSecretOpen] = useState(false); // dead-pixel trigger
-  const [isHiddenVideoOpen, setIsHiddenVideoOpen] = useState(false); // footer trigger
-  const [isLoreVideoOpen, setIsLoreVideoOpen] = useState(false); // search 'lore' trigger
+  const [isSecretOpen, setIsSecretOpen] = useState(false);
+  const [isHiddenVideoOpen, setIsHiddenVideoOpen] = useState(false);
+  const [isLoreVideoOpen, setIsLoreVideoOpen] = useState(false);
   const [isInspectOpen, setIsInspectOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -50,14 +49,16 @@ export default function AetherArchive() {
     "[LOG]: 0x45 0x59 0x45 0x53",
     "[LOG]: SECURITY_VULNERABILITY: 'B_R_E_A_C_H'",
     "[LOG]: TYPE_'LOGS'_TO_DECRYPT",
-    "[LOG]: TYPE_'WIRE'_FOR_GRID",
-    "[LOG]: SEARCH_'LORE'_FOR_THE_TRUTH"
+    "[LOG]: TYPE_'WIRE'_FOR_DIAGNOSTICS",
+    "[LOG]: SEARCH_'LORE'_FOR_THE_TRUTH",
+    "[LOG]: TYPE_'404'_TO_PURGE"
   ];
 
   const logDatabase = [
-    { type: 'error', text: "[SYSTEM]: FATAL_ERROR. Subject 'Dylon Martineau' has exceeded temporal bounds." },
-    { type: 'admin', user: 'ADMIN_01', text: "He wasn't supposed to stay in the render. Why is Sora keeping him?" },
-    { type: 'admin', user: 'DEPT_CHIEF', text: "Stop the extraction. If we pull Dylon out now, the archive collapses." },
+    { type: 'error', text: "[SYSTEM]: FATAL_ERROR in Sector_7. Subject 'Dylon Martineau' has exceeded temporal bounds." },
+    { type: 'admin', user: 'ADMIN_01', text: "He wasn't supposed to stay in the render. Why is the Sora engine keeping Dylon?" },
+    { type: 'user', user: 'NULL_RECOVERY', text: "I saw Dylon in Case File 3. He looked at the camera, but his eyes... they weren't digital anymore." },
+    { type: 'admin', user: 'DEPT_CHIEF', text: "Stop the extraction. If we pull Dylon Martineau out now, the entire archive collapses." },
     { type: 'system', text: "[ALERT]: subject_martineau_01 status: LOST_IN_TRANSITION." }
   ];
 
@@ -69,18 +70,18 @@ export default function AetherArchive() {
     { src: "image9.png", meta: "CASE_FILE_NULL_SPACE" }
   ];
 
-  // --- AUDIO SYNC FIX: Stops music if any overlay video is playing ---
+  // --- AUDIO SYNC: SILENCE MUSIC WHEN ANY VIDEO PLAYS ---
   useEffect(() => {
     if (!audioRef.current) return;
-    const isAnyVideoActive = activeVideo || isLoreVideoOpen || isSecretOpen || isHiddenVideoOpen;
-    if (isMuted || isAnyVideoActive) {
+    const isAnyVideoOpen = activeVideo || isLoreVideoOpen || isSecretOpen || isHiddenVideoOpen;
+    if (isMuted || isAnyVideoOpen) {
       audioRef.current.pause();
     } else {
       audioRef.current.play().catch(() => {});
     }
   }, [isMuted, activeVideo, isLoreVideoOpen, isSecretOpen, isHiddenVideoOpen]);
 
-  // --- SUPABASE & HINT ROTATOR ---
+  // --- SUPABASE & HINTS ---
   useEffect(() => {
     const fetchIdeas = async () => {
       const { data } = await supabase.from('ideas').select('*').order('created_at', { ascending: false });
@@ -90,8 +91,8 @@ export default function AetherArchive() {
     const channel = supabase.channel('db').on('postgres_changes', { event: '*', schema: 'public', table: 'ideas' }, (p) => {
       if (p.eventType === 'INSERT') setSubmittedIdeas(prev => [p.new, ...prev]);
     }).subscribe();
-    const hintInterval = setInterval(() => setCurrentHint(p => (p + 1) % hints.length), 8000);
-    return () => { supabase.removeChannel(channel); clearInterval(hintInterval); };
+    const hInterval = setInterval(() => setCurrentHint(p => (p + 1) % hints.length), 8000);
+    return () => { supabase.removeChannel(channel); clearInterval(hInterval); };
   }, []);
 
   const handleIdeaSubmit = async (e) => {
@@ -101,24 +102,23 @@ export default function AetherArchive() {
     setUserIdea("");
   };
 
-  // --- NEURAL SEARCH (LORE + DYLON RED FIX) ---
+  // --- NEURAL SEARCH (LORE + DYLON) ---
   const handleNeuralSearch = (e) => {
     e.preventDefault();
     const q = searchQuery.toLowerCase().trim();
-    if (q === "lore") {
-      setIsLoreVideoOpen(true);
-    } else if (q.includes("dylon") || q.includes("martineau")) {
+    if (q === "lore") setIsLoreVideoOpen(true);
+    if (q.includes("dylon") || q.includes("martineau")) {
       setIsCorrupting(true);
-      setTimeout(() => {
-        setIsCorrupting(false);
-        setIsBreached(true);
-        setTimeout(() => setIsBreached(false), 5000);
+      setTimeout(() => { 
+        setIsCorrupting(false); 
+        setIsBreached(true); 
+        setTimeout(() => setIsBreached(false), 5000); 
       }, 3000);
     }
     setSearchQuery("");
   };
 
-  // --- EXTRACTION LOGIC ---
+  // --- DATA EXTRACTION ---
   const startDownload = () => {
     setIsDownloading(true); setDownloadProgress(0);
     const interval = setInterval(() => {
@@ -134,7 +134,7 @@ export default function AetherArchive() {
     }, 100);
   };
 
-  // --- KEYBOARD COMMANDS (EYES, BREACH, LOGS, WIRE) ---
+  // --- KEYBOARD COMMANDS ---
   useEffect(() => {
     const handleKeys = (e) => {
       const b = (inputBuffer + e.key.toLowerCase()).slice(-10);
@@ -143,12 +143,13 @@ export default function AetherArchive() {
       if (b.endsWith("breach")) { setIsBreached(true); setTimeout(() => setIsBreached(false), 8000); }
       if (b.endsWith("logs")) setIsLogsOpen(true);
       if (b.endsWith("wire")) setIsWireframe(!isWireframe);
+      if (b.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
     };
     window.addEventListener("keydown", handleKeys);
     return () => window.removeEventListener("keydown", handleKeys);
   }, [inputBuffer, isWireframe]);
 
-  // --- CURSOR FIX ---
+  // --- CURSOR SYSTEM ---
   useEffect(() => {
     const move = (e) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
@@ -165,8 +166,9 @@ export default function AetherArchive() {
   }, []);
 
   return (
-    <div className={`min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isBreached ? 'breach-active' : ''} ${isWireframe ? 'wireframe-active' : ''}`}>
+    <div className={`min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isBreached ? 'breach-active' : ''} ${isWireframe ? 'wireframe-active' : ''} ${is404 ? 'system-wipe' : ''}`}>
       <audio ref={audioRef} src="/music.mp3" loop />
+      {isDownloading && <div className="data-leak-bg" />}
       
       {/* ATMOSPHERIC LAYERS */}
       <div className="fixed inset-0 z-0 pointer-events-none">
@@ -179,28 +181,54 @@ export default function AetherArchive() {
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
-            <span className={isBreached ? 'text-red-500' : ''}>{isBreached ? 'SYSTEM_BREACHED' : 'AETHER_CORE_STATION'}</span>
-            <span className="secret-trigger pointer-events-auto">CREATOR: DYLON MARTINEAU</span>
-            <motion.span key={currentHint} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-white/40 italic">{hints[currentHint]}</motion.span>
+            <span className={isBreached ? 'text-red-500' : ''}>{isBreached ? 'SYSTEM_BREACHED' : (is404 ? 'PURGING_DATA...' : 'AETHER_CORE_STATION')}</span>
             
             {/* DEAD PIXEL (secret.mp4) */}
             <div className="dead-pixel pointer-events-auto mt-4 w-1.5 h-1.5 bg-red-600 shadow-[0_0_10px_red] cursor-pointer" onClick={() => setIsSecretOpen(true)} />
+            
+            <motion.span key={currentHint} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-white/40 italic">{hints[currentHint]}</motion.span>
             
             <button onClick={() => setIsInspectOpen(true)} className="flex items-center gap-2 mt-4 text-white/10 hover:text-red-600 transition-all pointer-events-auto clickable uppercase">
               <Eye size={12} /> Inspect_Hidden_Lore
             </button>
           </div>
-          <button onClick={() => setIsMuted(!isMuted)} className="clickable pointer-events-auto p-2">
-            {isMuted ? <VolumeX size={24} className="text-red-600" /> : <Volume2 size={24} className="text-white/40" />}
-          </button>
+
+          {/* TOP RIGHT: CREATOR & MUTE (WITH HOVER SECRET) */}
+          <div className="flex items-start gap-12 pointer-events-auto">
+             <div className="flex flex-col items-end">
+               <span 
+                className="secret-trigger clickable hover:text-red-600 transition-all"
+                onMouseEnter={() => setHoverSecret("SUBJECT_01_MARTINEAU_RECOVERED")}
+                onMouseLeave={() => setHoverSecret("")}
+               >
+                 CREATOR: DYLON MARTINEAU
+               </span>
+               <button onClick={() => setIsMuted(!isMuted)} className="clickable mt-4">
+                  {isMuted ? <VolumeX size={24} className="text-red-600" /> : <Volume2 size={24} className="text-white/40" />}
+               </button>
+             </div>
+          </div>
         </div>
+
+        <AnimatePresence>
+          {hoverSecret && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute top-24 right-10 text-red-600 text-[12px] font-bold tracking-[0.5em] jitter-redacted">
+              {hoverSecret}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* MAIN UI */}
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
         <h1 className={`text-[4.5rem] md:text-[10rem] font-black italic mb-2 tracking-tighter ${isBreached || isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}>
-          AETHER_CORE
+          {is404 ? "VOID" : "AETHER_CORE"}
         </h1>
+
+        {/* RESTORED SITE DESCRIPTION */}
+        <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-12 text-center max-w-2xl px-6 leading-loose">
+          A digital archive of recovered generative visuals, dreamcore aesthetics, and encrypted short-film sequences. 
+          <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
+        </p>
 
         <div className="w-full max-w-2xl px-6 mb-12">
           <form onSubmit={handleNeuralSearch} className="relative group">
@@ -218,7 +246,7 @@ export default function AetherArchive() {
           {capturedData && <div className="mt-4 text-red-500 text-[10px] font-bold tracking-widest jitter-redacted">{capturedData}</div>}
         </div>
 
-        {/* VIDEOS */}
+        {/* VIDEO GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl px-8 mb-40">
           {["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"].map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -227,12 +255,14 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* IMAGES (WITH METADATA HOVER) */}
+        {/* IMAGE GALLERY (RESTORED HOVER METADATA) */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6 mb-40">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group relative clickable" onClick={() => setSelectedImg(img.src)} onMouseEnter={() => setHoverSecret(img.meta)} onMouseLeave={() => setHoverSecret("")}>
               <img src={`/${img.src}`} className="w-full h-full object-cover opacity-20 group-hover:opacity-100 grayscale hover:grayscale-0 transition-all" />
-              <div className="absolute top-2 right-2 text-[7px] text-white/0 group-hover:text-white/40 transition-opacity font-mono">{img.meta}</div>
+              <div className="absolute top-2 right-2 text-[7px] text-white/0 group-hover:text-white/40 transition-opacity font-mono tracking-widest">
+                {img.meta}
+              </div>
             </div>
           ))}
         </div>
@@ -243,7 +273,7 @@ export default function AetherArchive() {
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-1 border border-white/10 p-6 bg-white/[0.02]">
                 <form onSubmit={handleIdeaSubmit} className="flex flex-col gap-4">
-                  <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Transmit data..." className="bg-black border border-white/10 p-3 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[100px] resize-none" />
+                  <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Transmit..." className="bg-black border border-white/10 p-3 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[100px] resize-none" />
                   <button type="submit" className="bg-white/5 border border-white/10 py-2 text-[10px] uppercase hover:bg-white hover:text-black transition-all clickable">Send</button>
                 </form>
               </div>
@@ -258,7 +288,7 @@ export default function AetherArchive() {
         </div>
       </main>
 
-      {/* FOOTER (hidden.mp4 trigger restored) */}
+      {/* FOOTER (HIDDEN TRIGGER) */}
       <footer className="fixed bottom-0 w-full z-[60] py-4 bg-black border-t border-white/5 overflow-hidden">
         <div className="flex whitespace-nowrap animate-marquee text-[10px] tracking-[0.5em] uppercase text-white/10">
           <span className="mx-20">SYSTEM_STABILITY: NOMINAL</span>
@@ -282,7 +312,7 @@ export default function AetherArchive() {
                <h3 className="text-red-600 text-xl tracking-[1em] uppercase mb-8">Unauthorized_Access_Log</h3>
                <div className="space-y-4 text-[12px] text-white/40 text-left border border-white/10 p-8 bg-red-950/5">
                  <p>[DECRYPTED]: Subject Dylon Martineau is a recurring artifact within the Sora latent space.</p>
-                 <p>[DECRYPTED]: Every generation since the December update contains a 0.04% pixel variation shaped like his silhouette.</p>
+                 <p>[DECRYPTED]: The mall videos are not just renders. They are memories stored in the machine.</p>
                </div>
             </div>
           </motion.div>
@@ -322,8 +352,7 @@ export default function AetherArchive() {
 
         {isCorrupting && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[2000] bg-red-950/40 backdrop-blur-md flex flex-col items-center justify-center">
-            <div className="corruption-scanner" />
-            <div className="text-red-600 font-black text-5xl animate-pulse tracking-[1.2em]">CORRUPTING...</div>
+            <div className="corruption-scanner" /><div className="text-red-600 font-black text-5xl animate-pulse tracking-[1.2em]">CORRUPTING...</div>
           </motion.div>
         )}
 
