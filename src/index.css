@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
-/* --- GLOBAL --- */
-* { cursor: none !important; }
+/* --- GLOBAL SETTINGS --- */
+* {
+  cursor: none !important;
+}
 
 html, body {
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
   background-color: black;
   color: white;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -23,11 +26,13 @@ html, body {
   box-shadow: 0 0 40px rgba(0,0,0,0.5);
 }
 
-/* --- THE CENTERED CROSSHAIR --- */
+/* --- THE PERFECTED CROSSHAIR CURSOR --- */
 .custom-cursor {
-  position: fixed; top: 0; left: 0;
+  position: fixed; 
+  top: 0; left: 0;
   width: 40px; height: 40px;
-  pointer-events: none; z-index: 999999;
+  pointer-events: none; 
+  z-index: 999999;
   mix-blend-mode: difference;
   will-change: transform;
   margin-left: -20px; 
@@ -40,11 +45,12 @@ html, body {
 .cursor-dot { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
 
 .custom-cursor.cursor-hovering .cursor-dot {
-  background: red; box-shadow: 0 0 15px red;
+  background: red;
+  box-shadow: 0 0 15px red;
   transform: translate(-50%, -50%) scale(2.5);
 }
 
-/* --- HORROR EFFECTS --- */
+/* --- CRYPTIC TRIGGER EFFECTS --- */
 .screen-shake {
   animation: shake 0.12s infinite !important;
   filter: contrast(2) saturate(0) brightness(1.2) !important;
@@ -71,24 +77,36 @@ html, body {
   100% { transform: translate(0,0); }
 }
 
-/* --- LAYERS & SCANLINES --- */
+/* --- ATMOSPHERIC LAYERS --- */
 .vhs-filter {
-  position: fixed; inset: 0;
+  position: fixed;
+  inset: 0;
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
               linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
   background-size: 100% 3px, 3px 100%;
-  pointer-events: none; z-index: 5;
+  pointer-events: none;
+  z-index: 5;
 }
 
 .scanline {
-  position: fixed; width: 100%; height: 100px;
+  position: fixed;
+  width: 100%;
+  height: 100px;
   background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
   animation: scan 10s linear infinite;
-  pointer-events: none; z-index: 40;
+  pointer-events: none;
+  z-index: 40;
 }
+
 @keyframes scan { from { top: -100px; } to { top: 100vh; } }
 
-/* SEAMLESS MARQUEE */
+/* --- TERMINAL SCROLLBAR --- */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,0,0,0.5); }
+
+/* --- FOOTER MARQUEE --- */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -100,9 +118,7 @@ html, body {
   display: flex;
 }
 
-.backdrop-blur-md { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-
-/* INTERACTION */
+/* --- COMPONENT INTERACTION --- */
 .clickable { transition: transform 0.1s ease; }
 .clickable:active { transform: scale(0.95); }
 
