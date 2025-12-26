@@ -151,13 +151,22 @@ export default function AetherArchive() {
         </h1>
 
         {/* SOCIAL LINKS */}
-        <div className="flex gap-8 mb-20">
+        <div className="flex gap-8 mb-10">
           <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest">
             <MonitorPlay size={14} /> Sora Profile
           </a>
           <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest">
             <Youtube size={14} /> YouTube
           </a>
+        </div>
+
+        {/* RESTORED DESCRIPTION */}
+        <div className="max-w-xl text-center mb-20 px-6">
+          <p className="text-[10px] leading-relaxed text-white/30 uppercase tracking-[0.2em] italic">
+            "Recovered data from a fragmented reality. This archive serves as a digital vessel for visual experiments, 
+            AI-driven narratives, and the exploration of the uncanny. 
+            Synchronizing with Aether Core... monitoring Sora and Gemini outputs in real-time."
+          </p>
         </div>
 
         {/* SORA CREATIONS GRID */}
@@ -195,7 +204,6 @@ export default function AetherArchive() {
         </div>
       </footer>
 
-      {/* OVERLAYS */}
       <AnimatePresence>
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
