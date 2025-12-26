@@ -13,11 +13,12 @@ export default function AetherArchive() {
   const [isGlitching, setIsGlitching] = useState(false);
   const [isBreached, setIsBreached] = useState(false);
   const [is404, setIs404] = useState(false);
+  const [isWireframe, setIsWireframe] = useState(false); // NEW: Wireframe state
   const [isLogsOpen, setIsLogsOpen] = useState(false);
   const [randomLogs, setRandomLogs] = useState([]);
   const [inputBuffer, setInputBuffer] = useState("");
   const [isSecretOpen, setIsSecretOpen] = useState(false);
-  const [isHiddenOpen, setIsHiddenOpen] = useState(false); // NEW: State for hidden.mp4
+  const [isHiddenOpen, setIsHiddenOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [hoverSecret, setHoverSecret] = useState("");
@@ -37,6 +38,7 @@ export default function AetherArchive() {
     "[LOG]: SECURITY_VULNERABILITY: 'B_R_E_A_C_H'",
     "[LOG]: ERR_NOT_FOUND: 4_0_4",
     "[LOG]: TYPE_'LOGS'_TO_DECRYPT",
+    "[LOG]: TYPE_'WIRE'_TO_SEE_THE_GRID",
     "[LOG]: ACCELERATION_BREAKS_REALITY"
   ];
 
@@ -139,6 +141,14 @@ export default function AetherArchive() {
   };
 
   useEffect(() => {
+    // NEW: Ghost Log for developers/inspectors
+    console.log(
+      "%c [RECOVERY_NODE_09]: If you are reading this, the extraction failed. Dylon is not a file; he is the filesystem. Stop searching for 'hidden.mp4'. It's a loop. ", 
+      "color: red; background: black; font-size: 14px; font-weight: bold; border: 1px solid red; padding: 5px;"
+    );
+  }, []);
+
+  useEffect(() => {
     if (isLogsOpen) {
       const shuffled = [...logDatabase].sort(() => 0.5 - Math.random());
       setRandomLogs(shuffled.slice(0, 5));
@@ -220,13 +230,14 @@ export default function AetherArchive() {
       if (buffer.endsWith("breach")) { setIsBreached(true); setTimeout(() => setIsBreached(false), 8000); }
       if (buffer.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
       if (buffer.endsWith("logs")) { setIsLogsOpen(true); }
+      if (buffer.endsWith("wire")) { setIsWireframe(!isWireframe); } // Trigger Wireframe
     };
     window.addEventListener("keydown", handleKeys);
     return () => window.removeEventListener("keydown", handleKeys);
-  }, [inputBuffer]);
+  }, [inputBuffer, isWireframe]);
 
   return (
-    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''} ${isBreached ? 'breach-active' : ''} ${is404 ? 'system-wipe' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
+    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''} ${isBreached ? 'breach-active' : ''} ${is404 ? 'system-wipe' : ''} ${isWireframe ? 'wireframe-active' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
       {isDownloading && <div className="data-leak-bg" />}
       
@@ -266,17 +277,21 @@ export default function AetherArchive() {
           {is404 ? "VOID" : (isBreached ? "ACCESS_DENIED" : (isEasterEgg ? "REDACTED" : "AETHER_CORE"))}
         </h1>
 
-        <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-12 text-center max-w-2xl px-6 leading-loose">
+        <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-4 text-center max-w-2xl px-6 leading-loose">
           A digital archive of recovered generative visuals, dreamcore aesthetics, and encrypted short-film sequences. 
           <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
         </p>
+
+        {/* Hover Lore Message */}
+        <div className="mb-12 text-[10px] tracking-widest text-white/20 uppercase">
+          Status: <span className="corrupted-text">DYLON_IS_THE_RENDER_ENGINE</span>
+        </div>
 
         <div className="flex gap-8 mb-12">
           <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest"><MonitorPlay size={14} /> Sora</a>
           <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest"><Youtube size={14} /> YouTube</a>
         </div>
 
-        {/* NEURAL SEARCH BAR */}
         <div className="w-full max-w-xl px-6 mb-12">
           <form onSubmit={handleNeuralSearch} className="relative group">
             <div className="absolute -inset-0.5 bg-red-600/20 blur opacity-0 group-hover:opacity-100 transition duration-1000"></div>
@@ -296,7 +311,6 @@ export default function AetherArchive() {
           </p>
         </div>
 
-        {/* DATA EXTRACTION BUTTON */}
         <div className="mb-20 flex flex-col items-center">
           <button 
             onClick={startDownload} 
@@ -370,20 +384,10 @@ export default function AetherArchive() {
         <div className="flex whitespace-nowrap animate-marquee text-[9px] tracking-[0.4em] uppercase text-white/10">
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
-          <span 
-            className="mx-12 clickable hover:text-white transition-colors"
-            onClick={() => setIsHiddenOpen(true)}
-          >
-            DYLON MARTINEAU // @JHORRORGAMER
-          </span>
+          <span className="mx-12 clickable hover:text-white transition-colors" onClick={() => setIsHiddenOpen(true)}>DYLON MARTINEAU // @JHORRORGAMER</span>
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
-          <span 
-            className="mx-12 clickable hover:text-white transition-colors"
-            onClick={() => setIsHiddenOpen(true)}
-          >
-            DYLON MARTINEAU // @JHORRORGAMER
-          </span>
+          <span className="mx-12 clickable hover:text-white transition-colors" onClick={() => setIsHiddenOpen(true)}>DYLON MARTINEAU // @JHORRORGAMER</span>
         </div>
       </footer>
 
@@ -419,20 +423,13 @@ export default function AetherArchive() {
 
         {isCorrupting && (
           <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[2000] bg-red-950/20 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-none"
           >
             <div className="corruption-scanner" />
             <div className="text-red-600 font-black text-4xl animate-pulse mb-4 tracking-[1em]">CORRUPTION_IN_PROGRESS</div>
             <div className="w-64 h-1 bg-white/10 overflow-hidden">
-              <motion.div 
-                initial={{ x: "-100%" }} 
-                animate={{ x: "100%" }} 
-                transition={{ duration: 2.5, ease: "linear" }}
-                className="w-full h-full bg-red-600 shadow-[0_0_15px_red]"
-              />
+              <motion.div initial={{ x: "-100%" }} animate={{ x: "100%" }} transition={{ duration: 2.5, ease: "linear" }} className="w-full h-full bg-red-600 shadow-[0_0_15px_red]" />
             </div>
             <p className="text-red-600 text-[10px] mt-4 uppercase tracking-[0.5em]">Deleting unauthorized subject_data: MARTINEAU</p>
           </motion.div>
@@ -445,7 +442,6 @@ export default function AetherArchive() {
           </motion.div>
         )}
 
-        {/* HIDDEN BACKDOOR MODAL */}
         {isHiddenOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[3000] bg-black flex items-center justify-center">
              <X className="absolute top-10 right-10 text-white/20 clickable z-[3010]" size={32} onClick={() => setIsHiddenOpen(false)} />
