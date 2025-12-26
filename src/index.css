@@ -11,6 +11,17 @@ html, body {
   overflow-x: hidden;
 }
 
+/* --- VIDEO MODAL: 1080x1920 (9:16) --- */
+.vertical-video-container {
+  height: 90vh; /* Scaled to fit screen height */
+  aspect-ratio: 9 / 16; /* Forced 1080x1920 ratio */
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
 /* --- THE CENTERED CROSSHAIR --- */
 .custom-cursor {
   position: fixed; top: 0; left: 0;
@@ -33,7 +44,6 @@ html, body {
 }
 
 /* --- SYSTEM CRASH & HORROR EFFECTS --- */
-
 .screen-shake {
   animation: shake 0.12s infinite !important;
   filter: contrast(2) saturate(0) brightness(1.2) !important;
@@ -61,7 +71,6 @@ html, body {
 }
 
 /* --- ATMOSPHERIC LAYERS --- */
-
 .vhs-filter {
   position: fixed; inset: 0;
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 

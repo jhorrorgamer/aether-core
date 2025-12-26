@@ -18,7 +18,7 @@ export default function AetherArchive() {
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  // Logic to pause background music when a video is active
+  // Audio management: Pauses BG music when any video is playing
   useEffect(() => {
     if (audioRef.current) {
       if (activeVideo || isSecretOpen) {
@@ -38,7 +38,7 @@ export default function AetherArchive() {
     return () => clearInterval(interval);
   }, []);
 
-  // Keyboard Listener
+  // Keyboard Listener (404 and EYES)
   useEffect(() => {
     const handleKeys = (e) => {
       const char = e.key.toLowerCase();
@@ -163,14 +163,12 @@ export default function AetherArchive() {
         </div>
       </main>
 
-      {/* Seamless Marquee Footer */}
       <footer className="fixed bottom-0 w-full z-[60] py-3 bg-black border-t border-white/5 overflow-hidden">
         <div className={`flex whitespace-nowrap animate-marquee text-[9px] tracking-[0.4em] uppercase ${isEasterEgg ? 'text-red-600' : 'text-white/10'}`}>
           <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
           <span className="mx-12">RECOVERED_DATA_V7.02</span>
-          {/* Mirror for Seamless Loop */}
           <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
@@ -186,7 +184,16 @@ export default function AetherArchive() {
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
             <X className="absolute top-10 right-10 text-white/50 clickable z-[110]" size={32} onClick={() => setActiveVideo(null)} />
-            <video src={`/${activeVideo}`} controls autoPlay className="max-w-4xl w-full border border-white/10" />
+            <div className="vertical-video-container border border-white/10 shadow-[0_0_50px_rgba(255,255,255,0.05)]">
+               <video 
+                 src={`/${activeVideo}`} 
+                 controls 
+                 autoPlay 
+                 loop 
+                 playsInline 
+                 className="w-full h-full object-cover" 
+               />
+            </div>
           </motion.div>
         )}
         {selectedImg && (
@@ -197,7 +204,7 @@ export default function AetherArchive() {
         {isSecretOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[500] bg-black flex items-center justify-center">
              <X className="absolute top-10 right-10 text-white/20 clickable z-[510]" size={32} onClick={() => setIsSecretOpen(false)} />
-             <video src="/secret.mp4" autoPlay className="w-full h-full object-contain" onEnded={() => setIsSecretOpen(false)} />
+             <video src="/secret.mp4" autoPlay playsInline className="w-full h-full object-contain" onEnded={() => setIsSecretOpen(false)} />
           </motion.div>
         )}
       </AnimatePresence>
