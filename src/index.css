@@ -1,109 +1,64 @@
 @import "tailwindcss";
 
-/* --- GLOBAL SETTINGS --- */
-* {
-  cursor: none !important; /* Hides the default system cursor for the custom crosshair */
-}
+/* --- CORE --- */
+* { cursor: none !important; }
 
 html, body {
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   background-color: black;
   color: white;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   overflow-x: hidden;
 }
 
-/* --- THE PERFECTED CROSSHAIR CURSOR --- */
+/* --- THE CURSOR --- */
 .custom-cursor {
-  position: fixed; 
-  top: 0; 
-  left: 0;
-  width: 40px; 
-  height: 40px;
-  pointer-events: none; 
-  z-index: 999999;
+  position: fixed; top: 0; left: 0;
+  width: 40px; height: 40px;
+  pointer-events: none; z-index: 999999;
   mix-blend-mode: difference;
   will-change: transform;
-  
-  /* Centering Logic */
-  margin-left: -20px; 
-  margin-top: -20px;
-
-  /* Initial position off-screen */
+  margin-left: -20px; margin-top: -20px;
   transform: translate3d(-100px, -100px, 0);
 }
 
-.cursor-line-v {
-  position: absolute;
-  left: 50%;
-  height: 100%;
-  width: 1px;
-  background: white;
-  transform: translateX(-50%);
-}
+.cursor-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: white; transform: translateX(-50%); }
+.cursor-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: white; transform: translateY(-50%); }
+.cursor-dot { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
 
-.cursor-line-h {
-  position: absolute;
-  top: 50%;
-  width: 100%;
-  height: 1px;
-  background: white;
-  transform: translateY(-50%);
-}
-
-.cursor-dot {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 4px;
-  height: 4px;
-  background: white;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Red dot glow effect when hovering over interactive elements */
 .custom-cursor.cursor-hovering .cursor-dot {
-  background: red;
-  box-shadow: 0 0 15px red;
+  background: red; box-shadow: 0 0 15px red;
   transform: translate(-50%, -50%) scale(2.5);
 }
 
-/* --- VERTICAL VIDEO MODAL (9:16 Aspect Ratio) --- */
+/* --- VERTICAL MODAL --- */
 .vertical-video-container {
   height: 90vh;
   aspect-ratio: 9 / 16;
   background: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 50px black;
 }
 
-/* --- TERMINAL & FEED SCROLLBAR --- */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+/* --- ATMOSPHERE --- */
+.vhs-filter {
+  position: fixed; inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+              linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+  background-size: 100% 3px, 3px 100%;
+  pointer-events: none; z-index: 5;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+.scanline {
+  position: fixed; width: 100%; height: 100px;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
+  animation: scan 10s linear infinite;
+  pointer-events: none; z-index: 40;
 }
+@keyframes scan { from { top: -100px; } to { top: 100vh; } }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 0, 0, 0.5); /* Glows red on hover */
-}
-
-/* --- TRIGGERED INSTABILITY EFFECTS --- */
-
-/* 404 / Glitch Shake */
+/* --- GLITCHES --- */
 .screen-shake {
   animation: shake 0.12s infinite !important;
   filter: contrast(2) saturate(0) brightness(1.2) !important;
@@ -117,7 +72,6 @@ html, body {
   100% { transform: translate(2px, -2px); }
 }
 
-/* "Eyes" Redacted Mode Jitter */
 .jitter-redacted {
   color: #ff0000 !important;
   text-shadow: 4px 0 #00ffff, -4px 0 #ff00ff;
@@ -131,36 +85,11 @@ html, body {
   100% { transform: translate(0,0); }
 }
 
-/* --- ATMOSPHERIC OVERLAYS --- */
+/* --- UI COMPONENTS --- */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 0, 0, 0.5); }
 
-/* VHS Scanlines and Color Bleed */
-.vhs-filter {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-              linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-  background-size: 100% 3px, 3px 100%;
-  pointer-events: none;
-  z-index: 5;
-}
-
-/* Moving Scanline Overlay */
-.scanline {
-  position: fixed;
-  width: 100%;
-  height: 100px;
-  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
-  animation: scan 10s linear infinite;
-  pointer-events: none;
-  z-index: 40;
-}
-
-@keyframes scan {
-  from { top: -100px; }
-  to { top: 100vh; }
-}
-
-/* Footer Marquee Loop */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -172,22 +101,8 @@ html, body {
   display: flex;
 }
 
-/* --- INTERACTION --- */
-.clickable {
-  transition: transform 0.1s ease;
-}
+.clickable { transition: transform 0.1s ease; }
+.clickable:active { transform: scale(0.95); }
 
-.clickable:active {
-  transform: scale(0.95);
-}
-
-.dead-pixel {
-  transition: all 0.2s ease;
-  cursor: none !important;
-}
-
-.dead-pixel:hover {
-  transform: scale(3);
-  background-color: #ff0000;
-  box-shadow: 0 0 20px #ff0000;
-}
+.dead-pixel { transition: all 0.2s ease; cursor: none !important; }
+.dead-pixel:hover { transform: scale(3); background-color: #ff0000; box-shadow: 0 0 20px #ff0000; }
