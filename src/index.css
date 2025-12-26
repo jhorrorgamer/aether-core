@@ -3,28 +3,28 @@
 html, body {
   margin: 0; padding: 0;
   background-color: black;
-  cursor: none !important; /* Hides system cursor */
+  cursor: none !important; /* Hides the real mouse */
   overflow-x: hidden;
 }
 
-/* --- THE CURSOR --- */
+/* --- THE FIX: FIXED POSITIONING --- */
 .custom-cursor {
-  position: fixed; /* Fixes cursor to viewport, ignores scroll */
+  position: fixed; /* Relative to window, ignores scroll */
   width: 40px;
   height: 40px;
   pointer-events: none;
   z-index: 9999;
   mix-blend-mode: difference;
-  transform: translate(-50%, -50%); /* Centers the lines on the mouse tip */
+  transform: translate(-50%, -50%); /* Centers cursor on mouse tip */
 }
 
 .cursor-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: white; }
 .cursor-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: white; }
 .cursor-dot { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
 
-.cursor-hovering .cursor-dot { background: #ff0000; box-shadow: 0 0 8px red; }
+.cursor-hovering .cursor-dot { background: #ff0000; box-shadow: 0 0 10px red; }
 
-/* --- EFFECTS --- */
+/* --- HUD & FX --- */
 .scanline {
   position: fixed; width: 100%; height: 100px;
   background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
@@ -42,7 +42,7 @@ html, body {
 }
 
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.animate-marquee { animation: marquee 30s linear infinite; width: 200%; }
+.animate-marquee { animation: marquee 35s linear infinite; width: 200%; }
 
 .jitter-redacted {
   color: red !important;
@@ -56,3 +56,6 @@ html, body {
 }
 
 .dead-pixel { width: 3px; height: 3px; background: red; box-shadow: 0 0 5px red; cursor: none !important; }
+
+/* Forces system cursor hidden on interactive items */
+a, button, .clickable, img, video { cursor: none !important; }
