@@ -49,14 +49,14 @@ html, body {
   transform: translate(-50%, -50%) scale(2.5);
 }
 
-/* --- NEW: WIREFRAME MODE (The Grid) --- */
+/* --- WIREFRAME MODE --- */
 .wireframe-active {
   filter: invert(1) hue-rotate(90deg) brightness(1.5) contrast(1.2) !important;
 }
 
 .wireframe-active img, 
 .wireframe-active video {
-  opacity: 0.1 !important; /* Makes media look like ghosts in the machine */
+  opacity: 0.1 !important;
 }
 
 .wireframe-active main::before {
@@ -68,10 +68,10 @@ html, body {
   background-image: 
     linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
-  background-size: 50px 50px; /* The "Wireframe" Grid */
+  background-size: 50px 50px;
 }
 
-/* --- NEW: CORRUPTED LORE REVEAL --- */
+/* --- CORRUPTED LORE --- */
 .corrupted-text {
   background: white;
   color: transparent;
@@ -86,7 +86,7 @@ html, body {
   text-shadow: 0 0 8px red;
 }
 
-/* --- SYSTEM STATES (Void & Breach) --- */
+/* --- SYSTEM STATES --- */
 .system-wipe {
   filter: brightness(0) invert(1) grayscale(1);
   background-color: white !important;
@@ -103,7 +103,7 @@ html, body {
   100% { transform: translate(1px, -1px); }
 }
 
-/* --- ATMOSPHERIC EFFECTS --- */
+/* --- ATMOSPHERE --- */
 .vhs-filter {
   position: fixed;
   inset: 0;

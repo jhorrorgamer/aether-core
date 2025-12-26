@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { X, Youtube, MonitorPlay, Volume2, VolumeX, MessageSquare, Trash2, Terminal, ShieldAlert, Download } from "lucide-react";
+import { X, Youtube, MonitorPlay, Volume2, VolumeX, MessageSquare, Trash2, Terminal, ShieldAlert, Download, FileText } from "lucide-react";
 
 const supabaseUrl = 'https://mrjrampvdwmppmyyoxqs.supabase.co';
 const supabaseKey = 'sb_publishable_EPAWiAKKO-rKEPSWjZKmAQ_ErKQ5qFd';
@@ -13,12 +13,14 @@ export default function AetherArchive() {
   const [isGlitching, setIsGlitching] = useState(false);
   const [isBreached, setIsBreached] = useState(false);
   const [is404, setIs404] = useState(false);
-  const [isWireframe, setIsWireframe] = useState(false); // NEW: Wireframe state
+  const [isWireframe, setIsWireframe] = useState(false);
   const [isLogsOpen, setIsLogsOpen] = useState(false);
   const [randomLogs, setRandomLogs] = useState([]);
   const [inputBuffer, setInputBuffer] = useState("");
   const [isSecretOpen, setIsSecretOpen] = useState(false);
   const [isHiddenOpen, setIsHiddenOpen] = useState(false);
+  const [isScientistOpen, setIsScientistOpen] = useState(false); 
+  const [isNotesOpen, setIsNotesOpen] = useState(false); // NEW: State for scientists' notes
   const [activeVideo, setActiveVideo] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [hoverSecret, setHoverSecret] = useState("");
@@ -39,7 +41,8 @@ export default function AetherArchive() {
     "[LOG]: ERR_NOT_FOUND: 4_0_4",
     "[LOG]: TYPE_'LOGS'_TO_DECRYPT",
     "[LOG]: TYPE_'WIRE'_TO_SEE_THE_GRID",
-    "[LOG]: ACCELERATION_BREAKS_REALITY"
+    "[LOG]: SEARCH_'ANALYSIS'_FOR_LAB_RECORDS",
+    "[LOG]: TYPE_'NOTES'_FOR_RESEARCH_FILES"
   ];
 
   const logDatabase = [
@@ -101,7 +104,7 @@ export default function AetherArchive() {
   const resetIdleTimer = () => {
     clearTimeout(idleTimer.current);
     idleTimer.current = setTimeout(() => {
-      if (!isMuted && !activeVideo && !isSecretOpen && !isHiddenOpen) {
+      if (!isMuted && !activeVideo && !isSecretOpen && !isHiddenOpen && !isScientistOpen) {
         playWhisper();
         setIsGlitching(true);
         setTimeout(() => setIsGlitching(false), 400);
@@ -129,7 +132,15 @@ export default function AetherArchive() {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     const query = searchQuery.toLowerCase();
-    if (query.includes("dylon") || query.includes("martineau") || query.includes("subject")) {
+
+    if (query.includes("analysis") || query.includes("scientist") || query.includes("experiment")) {
+        setIsCorrupting(true);
+        setTimeout(() => {
+          setIsCorrupting(false);
+          setIsScientistOpen(true);
+        }, 3000);
+    } 
+    else if (query.includes("dylon") || query.includes("martineau") || query.includes("subject")) {
       setIsCorrupting(true);
       setTimeout(() => {
         setIsCorrupting(false);
@@ -139,14 +150,6 @@ export default function AetherArchive() {
     }
     setSearchQuery("");
   };
-
-  useEffect(() => {
-    // NEW: Ghost Log for developers/inspectors
-    console.log(
-      "%c [RECOVERY_NODE_09]: If you are reading this, the extraction failed. Dylon is not a file; he is the filesystem. Stop searching for 'hidden.mp4'. It's a loop. ", 
-      "color: red; background: black; font-size: 14px; font-weight: bold; border: 1px solid red; padding: 5px;"
-    );
-  }, []);
 
   useEffect(() => {
     if (isLogsOpen) {
@@ -184,11 +187,6 @@ export default function AetherArchive() {
       const hovered = !!e.target.closest('button, a, .clickable, input, textarea, .dead-pixel, img, video');
       if (hovered) cursorRef.current?.classList.add('cursor-hovering');
       else cursorRef.current?.classList.remove('cursor-hovering');
-      
-      if (Math.abs(e.movementX) > 130) {
-        setIsGlitching(true);
-        setTimeout(() => setIsGlitching(false), 100);
-      }
     };
 
     const updateCursor = () => {
@@ -208,8 +206,8 @@ export default function AetherArchive() {
 
   useEffect(() => {
     if (!audioRef.current) return;
-    (isMuted || activeVideo || is404 || isSecretOpen || isHiddenOpen) ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
-  }, [isMuted, activeVideo, is404, isSecretOpen, isHiddenOpen]);
+    (isMuted || activeVideo || is404 || isSecretOpen || isHiddenOpen || isScientistOpen || isNotesOpen) ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
+  }, [isMuted, activeVideo, is404, isSecretOpen, isHiddenOpen, isScientistOpen, isNotesOpen]);
 
   const handleIdeaSubmit = async (e) => {
     e.preventDefault();
@@ -230,7 +228,8 @@ export default function AetherArchive() {
       if (buffer.endsWith("breach")) { setIsBreached(true); setTimeout(() => setIsBreached(false), 8000); }
       if (buffer.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
       if (buffer.endsWith("logs")) { setIsLogsOpen(true); }
-      if (buffer.endsWith("wire")) { setIsWireframe(!isWireframe); } // Trigger Wireframe
+      if (buffer.endsWith("wire")) { setIsWireframe(!isWireframe); }
+      if (buffer.endsWith("notes")) { setIsNotesOpen(true); } // Secret Notes shortcut
     };
     window.addEventListener("keydown", handleKeys);
     return () => window.removeEventListener("keydown", handleKeys);
@@ -282,7 +281,6 @@ export default function AetherArchive() {
           <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
         </p>
 
-        {/* Hover Lore Message */}
         <div className="mb-12 text-[10px] tracking-widest text-white/20 uppercase">
           Status: <span className="corrupted-text">DYLON_IS_THE_RENDER_ENGINE</span>
         </div>
@@ -292,6 +290,7 @@ export default function AetherArchive() {
           <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest"><Youtube size={14} /> YouTube</a>
         </div>
 
+        {/* NEURAL SEARCH BAR */}
         <div className="w-full max-w-xl px-6 mb-12">
           <form onSubmit={handleNeuralSearch} className="relative group">
             <div className="absolute -inset-0.5 bg-red-600/20 blur opacity-0 group-hover:opacity-100 transition duration-1000"></div>
@@ -403,35 +402,58 @@ export default function AetherArchive() {
               </div>
               <div className="space-y-4 text-[11px] leading-relaxed max-h-[60vh] overflow-y-auto custom-scrollbar pr-4">
                 {randomLogs.map((log, i) => (
-                  <p key={i} className={`
-                    ${log.type === 'error' ? 'text-red-500/80' : ''}
-                    ${log.type === 'system' ? 'text-blue-400/60' : ''}
-                    ${log.type === 'admin' || log.type === 'user' ? 'text-white/40' : ''}
-                  `}>
+                  <p key={i} className={`${log.type === 'error' ? 'text-red-500/80' : ''} ${log.type === 'system' ? 'text-blue-400/60' : ''} ${log.type === 'admin' || log.type === 'user' ? 'text-white/40' : ''}`}>
                     {log.user && <span className="text-white/60">[{log.user}]: </span>}
                     {log.text}
                   </p>
                 ))}
               </div>
-              <div className="mt-8 pt-4 border-t border-white/10 text-[9px] text-white/20 flex justify-between uppercase">
-                <span>SIGNAL_ENCRYPTED</span>
-                <span>NODE_{Math.random().toString(36).substr(2, 5).toUpperCase()}</span>
+            </div>
+          </motion.div>
+        )}
+
+        {/* SCIENTISTS' RESEARCH NOTES MODAL */}
+        {isNotesOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1500] bg-black/90 flex items-center justify-center p-6" onClick={() => setIsNotesOpen(false)}>
+            <div className="w-full max-w-3xl border border-white/10 bg-zinc-950 p-10 relative overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="absolute top-0 left-0 w-full h-1 bg-red-600/50" />
+              <div className="flex justify-between items-start mb-10">
+                <div>
+                  <h3 className="text-red-600 text-xs tracking-[0.5em] font-bold uppercase mb-2">Internal_Memo // Project_Aether</h3>
+                  <p className="text-white/30 text-[9px] uppercase tracking-widest">Classification: TOP_SECRET // Level_5_Eyes_Only</p>
+                </div>
+                <X className="text-white/20 hover:text-white clickable" onClick={() => setIsNotesOpen(false)} />
+              </div>
+              <div className="space-y-6 text-[10px] text-white/70 leading-relaxed font-mono custom-scrollbar max-h-[50vh] overflow-y-auto pr-4">
+                <p><span className="text-red-500">[NOTE_01]:</span> Observation of Subject D. Martineau confirms a 98% synchronization rate with the Sora engine. He is no longer processing external stimuli.</p>
+                <p><span className="text-red-500">[NOTE_02]:</span> We attempted to disconnect the neural uplink at 0400 hours. The render architecture resisted. The 'Mall' geometry shifted to prevent our access. The site is protecting him.</p>
+                <p><span className="text-red-500">[NOTE_03]:</span> The subject's biological vitals are now mirroring the frame rate of the archive. If the archive crashes, his heart stops.</p>
+                <p className="italic text-white/40 pt-4">-- End of Decrypted Fragment --</p>
+              </div>
+              <div className="mt-10 flex items-center gap-4 text-white/10">
+                <FileText size={16} />
+                <span className="text-[8px] tracking-[0.8em]">AETHER_LABS_DIVISION</span>
               </div>
             </div>
           </motion.div>
         )}
 
         {isCorrupting && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[2000] bg-red-950/20 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-none"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[2000] bg-red-950/20 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-none">
             <div className="corruption-scanner" />
             <div className="text-red-600 font-black text-4xl animate-pulse mb-4 tracking-[1em]">CORRUPTION_IN_PROGRESS</div>
             <div className="w-64 h-1 bg-white/10 overflow-hidden">
               <motion.div initial={{ x: "-100%" }} animate={{ x: "100%" }} transition={{ duration: 2.5, ease: "linear" }} className="w-full h-full bg-red-600 shadow-[0_0_15px_red]" />
             </div>
-            <p className="text-red-600 text-[10px] mt-4 uppercase tracking-[0.5em]">Deleting unauthorized subject_data: MARTINEAU</p>
+          </motion.div>
+        )}
+
+        {/* LORE VIDEO MODAL */}
+        {isScientistOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[4000] bg-black flex items-center justify-center">
+             <div className="absolute top-10 left-10 text-red-600 text-[10px] tracking-[0.5em] animate-pulse">PROJECT_AETHER // ANALYSIS_LOG_04</div>
+             <X className="absolute top-10 right-10 text-white/20 clickable z-[4010]" size={32} onClick={() => setIsScientistOpen(false)} />
+             <video src="/lore.mp4" autoPlay playsInline className="w-full h-full object-contain" onEnded={() => setIsScientistOpen(false)} />
           </motion.div>
         )}
 
@@ -454,6 +476,7 @@ export default function AetherArchive() {
             <img src={`/${selectedImg}`} className="max-w-full max-h-full border border-white/10" />
           </motion.div>
         )}
+
         {isSecretOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[500] bg-black flex items-center justify-center">
              <X className="absolute top-10 right-10 text-white/20 clickable z-[510]" size={32} onClick={() => setIsSecretOpen(false)} />
