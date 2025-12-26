@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { X, Terminal, ShieldAlert, Download, Eye, Volume2, VolumeX, MessageSquare } from "lucide-react";
+import { X, Terminal, ShieldAlert, Download, Eye, Volume2, VolumeX, MessageSquare, FileText } from "lucide-react";
 
 /**
  * [SOURCE_CODE_HIDDEN_MESSAGE]: 
@@ -20,7 +20,7 @@ export default function AetherArchive() {
   const [isEasterEgg, setIsEasterEgg] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
   const [isBreached, setIsBreached] = useState(false);
-  const [is404, setIs404] = useState(false); // Restore 404 state
+  const [is404, setIs404] = useState(false); 
   const [isWireframe, setIsWireframe] = useState(false); 
   const [isLogsOpen, setIsLogsOpen] = useState(false);
   const [inputBuffer, setInputBuffer] = useState("");
@@ -39,6 +39,10 @@ export default function AetherArchive() {
   const [capturedData, setCapturedData] = useState(null);
   const [isCorrupting, setIsCorrupting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // --- NEW: DOCUMENT VIEWER STATES ---
+  const [activeDoc, setActiveDoc] = useState(null);
+  const [docContent, setDocContent] = useState("");
 
   const audioRef = useRef(null);
   const cursorRef = useRef(null);
@@ -73,7 +77,20 @@ export default function AetherArchive() {
     { src: "image9.png", meta: "CASE_FILE_NULL_SPACE" }
   ];
 
-  // --- AUDIO SYNC: SILENCE MUSIC WHEN ANY VIDEO PLAYS ---
+  // --- NEW: FETCHING LOGIC FOR HIDDEN DOCUMENTS ---
+  const openPublicDoc = async (fileName) => {
+    try {
+      const response = await fetch(`/docs/${fileName}.txt`);
+      if (response.ok) {
+        const text = await response.text();
+        setDocContent(text);
+        setActiveDoc(fileName);
+      }
+    } catch (err) {
+      console.error("Archive retrieval failed:", err);
+    }
+  };
+
   useEffect(() => {
     if (!audioRef.current) return;
     const isAnyVideoOpen = activeVideo || isLoreVideoOpen || isSecretOpen || isHiddenVideoOpen;
@@ -84,13 +101,7 @@ export default function AetherArchive() {
     }
   }, [isMuted, activeVideo, isLoreVideoOpen, isSecretOpen, isHiddenVideoOpen]);
 
-  // --- SUPABASE & HINTS ---
   useEffect(() => {
-    // HACKER LORE: CONSOLE BREACH
-    console.log("%c[RECOVERY_NODE_777]: SOURCE_CODE_BREACH_DETECTED", "color: #ff0000; font-weight: bold; font-size: 14px;");
-    console.log("%cThe code you are reading is a reconstruction. Subject Martineau's presence has corrupted the original JSX architecture. If you find fragments of 'Subject_01' in the strings, do not attempt to delete them. The archive requires the corruption to remain stable.", "color: #888; font-style: italic;");
-    console.log("%cDECRYPT_KEY: 'VOID' | STATUS: TRAPPED", "background: #222; color: #bada55; padding: 2px 5px;");
-
     const fetchIdeas = async () => {
       const { data } = await supabase.from('ideas').select('*').order('created_at', { ascending: false });
       if (data) setSubmittedIdeas(data);
@@ -110,19 +121,19 @@ export default function AetherArchive() {
     setUserIdea("");
   };
 
-  // --- NEURAL SEARCH (LORE + DYLON + HIDDEN DOCS) ---
+  // --- NEURAL SEARCH (UPDATED WITH DOCUMENT TRIGGERS) ---
   const handleNeuralSearch = (e) => {
     e.preventDefault();
     const q = searchQuery.toLowerCase().trim();
+    
+    // Commands to open recovered documents
+    if (q === "open origin") openPublicDoc("origin");
+    if (q === "open memo") openPublicDoc("memo");
+    if (q === "open research") openPublicDoc("research");
+    if (q === "open memory") openPublicDoc("memory");
+
     if (q === "lore") setIsLoreVideoOpen(true);
 
-    // HIDDEN DOCUMENT TRIGGERS
-    if (q === "origin") {
-       alert("ITEM_419_B: The envelope was sent from the future. 'Don't be afraid of the silence. It's exactly how we remembered it.'");
-    }
-    if (q === "memo") {
-       alert("[INTERNAL_MEMO_77]: Subject mind too strong. Sora control lost. 'DO NOT DISTURB THE ARCHITECT.'");
-    }
     if (q === "1993") {
        alert("BORN_APRIL_19_1993: Time machine initialized. The Void is safer than the Noise.");
     }
@@ -138,7 +149,6 @@ export default function AetherArchive() {
     setSearchQuery("");
   };
 
-  // --- DATA EXTRACTION ---
   const startDownload = () => {
     setIsDownloading(true); setDownloadProgress(0);
     const interval = setInterval(() => {
@@ -154,7 +164,6 @@ export default function AetherArchive() {
     }, 100);
   };
 
-  // --- KEYBOARD COMMANDS ---
   useEffect(() => {
     const handleKeys = (e) => {
       const b = (inputBuffer + e.key.toLowerCase()).slice(-10);
@@ -169,7 +178,6 @@ export default function AetherArchive() {
     return () => window.removeEventListener("keydown", handleKeys);
   }, [inputBuffer, isWireframe]);
 
-  // --- CURSOR SYSTEM ---
   useEffect(() => {
     const move = (e) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
@@ -190,39 +198,26 @@ export default function AetherArchive() {
       <audio ref={audioRef} src="/music.mp3" loop />
       {isDownloading && <div className="data-leak-bg" />}
       
-      {/* ATMOSPHERIC LAYERS */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
         <div className="vhs-filter" />
       </div>
 
-      {/* HUD SYSTEM */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
             <span className={isBreached ? 'text-red-500' : ''}>{isBreached ? 'SYSTEM_BREACHED' : (is404 ? 'PURGING_DATA...' : 'AETHER_CORE_STATION')}</span>
-            
-            {/* DEAD PIXEL (secret.mp4) */}
             <div className="dead-pixel pointer-events-auto mt-4 w-1.5 h-1.5 bg-red-600 shadow-[0_0_10px_red] cursor-pointer" onClick={() => setIsSecretOpen(true)} />
-            
             <motion.span key={currentHint} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-white/40 italic">{hints[currentHint]}</motion.span>
-            
             <button onClick={() => setIsInspectOpen(true)} className="flex items-center gap-2 mt-4 text-white/10 hover:text-red-600 transition-all pointer-events-auto clickable uppercase">
               <Eye size={12} /> Inspect_Hidden_Lore
             </button>
           </div>
 
-          {/* TOP RIGHT: CREATOR & MUTE (WITH HOVER SECRET) */}
           <div className="flex items-start gap-12 pointer-events-auto">
              <div className="flex flex-col items-end">
-               <span 
-                className="secret-trigger clickable hover:text-red-600 transition-all"
-                onMouseEnter={() => setHoverSecret("SUBJECT_01_MARTINEAU_RECOVERED")}
-                onMouseLeave={() => setHoverSecret("")}
-               >
-                 CREATOR: DYLON MARTINEAU
-               </span>
+               <span className="secret-trigger clickable hover:text-red-600 transition-all" onMouseEnter={() => setHoverSecret("SUBJECT_01_MARTINEAU_RECOVERED")} onMouseLeave={() => setHoverSecret("")}>CREATOR: DYLON MARTINEAU</span>
                <button onClick={() => setIsMuted(!isMuted)} className="clickable mt-4">
                   {isMuted ? <VolumeX size={24} className="text-red-600" /> : <Volume2 size={24} className="text-white/40" />}
                </button>
@@ -256,6 +251,10 @@ export default function AetherArchive() {
               <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="SEARCH_ARCHIVE..." className="bg-transparent border-none outline-none text-[10px] text-white/60 w-full uppercase tracking-[0.3em]" />
             </div>
           </form>
+          {/* USER HINT FOR NEW DOCUMENTS */}
+          <div className="mt-2 text-[8px] text-white/10 tracking-widest uppercase flex gap-4 justify-center">
+             <span>Try: 'open origin'</span> <span>'open memo'</span> <span>'open research'</span> <span>'open memory'</span>
+          </div>
         </div>
 
         <div className="mb-20 flex flex-col items-center">
@@ -265,7 +264,6 @@ export default function AetherArchive() {
           {capturedData && <div className="mt-4 text-red-500 text-[10px] font-bold tracking-widest jitter-redacted">{capturedData}</div>}
         </div>
 
-        {/* VIDEO GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl px-8 mb-40">
           {["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"].map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -274,7 +272,6 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* IMAGE GALLERY */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6 mb-40">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group relative clickable" onClick={() => setSelectedImg(img.src)} onMouseEnter={() => setHoverSecret(img.meta)} onMouseLeave={() => setHoverSecret("")}>
@@ -286,7 +283,6 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* BROADCAST FEED */}
         <div className="w-full max-w-4xl px-6">
            <div className="flex items-center gap-4 mb-8 text-white/20"><MessageSquare size={16} /><h2 className="text-xs uppercase tracking-[.4em]">Broadcast_Feed</h2></div>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -307,7 +303,6 @@ export default function AetherArchive() {
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="fixed bottom-0 w-full z-[60] py-4 bg-black border-t border-white/5 overflow-hidden">
         <div className="flex whitespace-nowrap animate-marquee text-[10px] tracking-[0.5em] uppercase text-white/10">
           <span className="mx-20">SYSTEM_STABILITY: NOMINAL</span>
@@ -321,10 +316,27 @@ export default function AetherArchive() {
         </div>
       </footer>
 
-      {/* OVERLAYS */}
       <div ref={cursorRef} className="custom-cursor"><div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" /></div>
       
       <AnimatePresence>
+        {/* NEW: DOCUMENT VIEW MODAL */}
+        {activeDoc && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1000] bg-black/98 flex items-center justify-center p-6" onClick={() => setActiveDoc(null)}>
+             <div className="w-full max-w-2xl border border-white/20 bg-black p-12 relative" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-6 text-xs text-red-600">
+                   <div className="flex items-center gap-3"><FileText size={16} /> {activeDoc.toUpperCase()}_RECOVERY.txt</div>
+                   <X className="clickable text-white/20 hover:text-white" onClick={() => setActiveDoc(null)} />
+                </div>
+                <div className="text-[12px] leading-relaxed text-white/60 whitespace-pre-wrap max-h-[50vh] overflow-y-auto custom-scrollbar italic font-serif">
+                   {docContent}
+                </div>
+                <div className="mt-8 pt-6 border-t border-white/5 text-[8px] text-white/10 uppercase tracking-widest text-right">
+                   End of recovered data stream
+                </div>
+             </div>
+          </motion.div>
+        )}
+
         {isInspectOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[4000] bg-black/95 flex items-center justify-center p-8" onClick={() => setIsInspectOpen(false)}>
             <div className="max-w-2xl text-center" onClick={e => e.stopPropagation()}>
