@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { X, Youtube, MonitorPlay, Volume2, VolumeX, Database, MessageSquare, Send, Trash2 } from "lucide-react";
 
-// --- SUPABASE CONNECTION ---
 const supabaseUrl = 'https://mrjrampvdwmppmyyoxqs.supabase.co';
 const supabaseKey = 'sb_publishable_EPAWiAKKO-rKEPSWjZKmAQ_ErKQ5qFd';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -22,8 +21,8 @@ export default function AetherArchive() {
   const [userIdea, setUserIdea] = useState("");
   const [submittedIdeas, setSubmittedIdeas] = useState([]);
   const [dbStatus, setDbStatus] = useState("connecting");
-  
   const [currentHint, setCurrentHint] = useState(0);
+
   const hints = [
     "[LOG]: 0x45 0x59 0x45 0x53",
     "[LOG]: SECURITY_VULNERABILITY: 'B_R_E_A_C_H'",
@@ -34,6 +33,7 @@ export default function AetherArchive() {
 
   const audioRef = useRef(null);
   const cursorRef = useRef(null);
+  const mousePos = useRef({ x: 0, y: 0 });
 
   const galleryImages = [
     { src: "image1.png", meta: "40.2525° N, 58.4398° E" }, 
@@ -48,10 +48,6 @@ export default function AetherArchive() {
   ];
 
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
-  const transmissions = [
-    { id: "01", title: "SIGNAL_01", body: "The vectors are bleeding into the interface. Reality at 42%.", secret: "INPUT_REQ: 0x45594553" },
-    { id: "02", title: "SIGNAL_02", body: "Batch 12-2025. The subject refused to wake up.", secret: "HINT: 4_0_4_WIPE" }
-  ];
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentHint(p => (p + 1) % hints.length), 7000);
@@ -73,6 +69,35 @@ export default function AetherArchive() {
       if (p.eventType === 'DELETE') setSubmittedIdeas(prev => prev.filter(i => i.id !== p.old.id));
     }).subscribe();
     return () => supabase.removeChannel(channel);
+  }, []);
+
+  // CURSOR ENGINE (Zero Offset Fix)
+  useEffect(() => {
+    const moveCursor = (e) => {
+      mousePos.current = { x: e.clientX, y: e.clientY };
+      const hovered = !!e.target.closest('button, a, .clickable, input, textarea, .dead-pixel, img, video');
+      if (hovered) cursorRef.current?.classList.add('cursor-hovering');
+      else cursorRef.current?.classList.remove('cursor-hovering');
+      
+      if (Math.abs(e.movementX) > 130) {
+        setIsGlitching(true);
+        setTimeout(() => setIsGlitching(false), 100);
+      }
+    };
+
+    const updateCursor = () => {
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate3d(${mousePos.current.x}px, ${mousePos.current.y}px, 0)`;
+      }
+      requestAnimationFrame(updateCursor);
+    };
+
+    window.addEventListener("mousemove", moveCursor);
+    const animFrame = requestAnimationFrame(updateCursor);
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      cancelAnimationFrame(animFrame);
+    };
   }, []);
 
   useEffect(() => {
@@ -103,31 +128,16 @@ export default function AetherArchive() {
     return () => window.removeEventListener("keydown", handleKeys);
   }, [inputBuffer]);
 
-  useEffect(() => {
-    const cursor = cursorRef.current;
-    const moveCursor = (e) => {
-      if (cursor) cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-      if (Math.abs(e.movementX) > 130) {
-        setIsGlitching(true);
-        setTimeout(() => setIsGlitching(false), 100);
-      }
-    };
-    window.addEventListener("mousemove", moveCursor);
-    return () => window.removeEventListener("mousemove", moveCursor);
-  }, []);
-
   return (
     <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''} ${isBreached ? 'breach-active' : ''} ${is404 ? 'system-wipe' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
       
-      {/* ATMOSPHERE */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
         <div className="vhs-filter" />
       </div>
 
-      {/* TOP HUD */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
@@ -138,7 +148,6 @@ export default function AetherArchive() {
                 {hints[currentHint]}
                </motion.span>
             </div>
-            {/* THE SECRET DEAD PIXEL */}
             <div className="dead-pixel pointer-events-auto mt-4 w-1.5 h-1.5 bg-red-600 shadow-[0_0_10px_red]" onClick={(e) => { e.stopPropagation(); setIsSecretOpen(true); }} />
           </div>
           <button onClick={() => setIsMuted(!isMuted)} className="clickable pointer-events-auto hover:text-white transition-colors">
@@ -155,16 +164,23 @@ export default function AetherArchive() {
       </div>
 
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
-        <h1 className={`text-[4.5rem] md:text-[9rem] font-black italic mb-4 transition-all tracking-tighter ${isEasterEgg || isBreached ? 'jitter-redacted' : 'text-white/10'}`}>
+        {/* MAIN TITLE */}
+        <h1 className={`text-[4.5rem] md:text-[9rem] font-black italic mb-2 transition-all tracking-tighter ${isEasterEgg || isBreached ? 'jitter-redacted' : 'text-white/10'}`}>
           {is404 ? "VOID" : (isBreached ? "ACCESS_DENIED" : (isEasterEgg ? "REDACTED" : "AETHER_CORE"))}
         </h1>
+
+        {/* RESTORED DESCRIPTION */}
+        <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-12 text-center max-w-2xl px-6 leading-loose">
+          A digital archive of recovered generative visuals, dreamcore aesthetics, and encrypted short-film sequences. 
+          <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
+        </p>
 
         <div className="flex gap-8 mb-20">
           <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest"><MonitorPlay size={14} /> Sora</a>
           <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest"><Youtube size={14} /> YouTube</a>
         </div>
 
-        {/* VIDEOS */}
+        {/* VIDEO GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-32">
           {soraVideos.map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -173,7 +189,7 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* GALLERY */}
+        {/* IMAGE GALLERY */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6 mb-40">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group relative clickable" onClick={() => setSelectedImg(img.src)} onMouseEnter={() => setHoverSecret(img.meta)} onMouseLeave={() => setHoverSecret("")}>
@@ -185,7 +201,7 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* BROADCAST */}
+        {/* BROADCAST FEED */}
         <div className="w-full max-w-4xl px-6">
            <div className="flex items-center gap-4 mb-8 text-white/20">
               <MessageSquare size={16} />
@@ -224,6 +240,7 @@ export default function AetherArchive() {
         </div>
       </footer>
 
+      {/* CURSOR COMPONENT */}
       <div ref={cursorRef} className="custom-cursor"><div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" /></div>
       
       <AnimatePresence>
