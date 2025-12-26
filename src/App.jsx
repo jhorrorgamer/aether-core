@@ -20,19 +20,26 @@ export default function AetherArchive() {
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  // --- ULTIMATE CURSOR FIX ---
+  // --- THE BULLETPROOF CURSOR ENGINE ---
   useEffect(() => {
+    const cursor = cursorRef.current;
+    if (!cursor) return;
+
     const moveCursor = (e) => {
-      if (cursorRef.current) {
-        // We use requestAnimationFrame to ensure it moves at the screen's refresh rate
-        requestAnimationFrame(() => {
-          cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-        });
+      // e.clientX/Y is the absolute position on the screen monitor
+      // We use translate3d to ensure the GPU handles the movement
+      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+      
+      // Update hovering state
+      const hovered = !!e.target.closest('button, a, .clickable, .dead-pixel, img, video');
+      if (hovered) {
+        cursor.classList.add('cursor-hovering');
+      } else {
+        cursor.classList.remove('cursor-hovering');
       }
-      setIsHovering(!!e.target.closest('button, a, .clickable, .dead-pixel, img, video'));
     };
 
-    window.addEventListener("mousemove", moveCursor);
+    window.addEventListener("mousemove", moveCursor, { passive: true });
     return () => window.removeEventListener("mousemove", moveCursor);
   }, []);
 
@@ -87,112 +94,82 @@ export default function AetherArchive() {
 
   return (
     <div 
-      className="relative min-h-screen w-full bg-black overflow-x-hidden font-mono text-white transition-all" 
+      className="relative min-h-screen w-full bg-black font-mono text-white" 
       onClick={handleInteraction}
-      style={{
-        filter: `contrast(${100 + audioLevel * 30}%)`,
-        transform: `scale(${1 + audioLevel * 0.005})`
-      }}
     >
       <audio ref={audioRef} src="/music.mp3" loop />
 
-      {/* THE CURSOR (REF BASED FOR ZERO DRIFT) */}
-      <div 
-        ref={cursorRef}
-        className={`custom-cursor ${isHovering ? 'cursor-hovering' : ''}`}
-      >
-        <div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" />
-      </div>
-
+      {/* BACKGROUNDS (Wrapped in a separate div to prevent layout shifts) */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-500 ${isEasterEgg ? 'opacity-0' : 'opacity-25'}`} />
+        <div 
+          className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-500 ${isEasterEgg ? 'opacity-0' : 'opacity-25'}`} 
+          style={{ transform: `scale(${1 + audioLevel * 0.05})` }}
+        />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
         <div className="vhs-filter" />
       </div>
 
+      {/* HUD (Fixed at the top) */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
             <span>STATION: AETHER_CORE</span>
-            <span>CREATOR: DYLON MARTINEAU</span>
+            <span>USER: DYLON_M</span>
             <div className="dead-pixel pointer-events-auto mt-4" onClick={() => setIsSecretOpen(true)} />
           </div>
-          <div className="text-right flex flex-col gap-4">
-            <div className="flex gap-4">
-              <span>GEMINI: {latency.gemini}</span>
-              <span>SORA: {latency.sora}</span>
-            </div>
+          <div className="text-right">
             <span>AUDIO_SYNC: {Math.round(audioLevel * 100)}%</span>
           </div>
         </div>
         <div className="scanline" style={{ opacity: 0.05 + audioLevel * 0.1 }} />
       </div>
 
-      <main className="relative z-10 flex flex-col items-center pt-40 pb-40">
-        <h1 
-          style={{ textShadow: `0 0 ${audioLevel * 40}px white` }}
-          className={`text-[5rem] md:text-[9rem] font-black italic mb-10 transition-all ${isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}
-        >
+      {/* MAIN CONTENT */}
+      <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
+        <h1 className={`text-[5rem] md:text-[9rem] font-black italic mb-10 transition-all ${isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}>
           {isEasterEgg ? "REDACTED" : "AETHER_CORE"}
         </h1>
 
-        <div className="flex gap-8 mb-20">
-          <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest cursor-none">
-            <MonitorPlay size={14} /> Sora
-          </a>
-          <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest cursor-none">
-            <Youtube size={14} /> YouTube
-          </a>
+        {/* VIDEOS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-20">
+          {soraVideos.map((vid, idx) => (
+            <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
+              <video src={`/${vid}`} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-30 group-hover:opacity-100 transition-opacity" />
+            </div>
+          ))}
         </div>
 
-        <section className="w-full max-w-6xl px-6 mb-32">
-          <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2">Sora Creations</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {soraVideos.map((vid, idx) => (
-              <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
-                <video src={`/${vid}`} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-30 group-hover:opacity-100 transition-opacity" />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="w-full max-w-6xl px-6">
-          <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2">Data Logs</h2>
-          <div className="grid grid-cols-3 gap-3">
-            {galleryImages.map((img, i) => (
-              <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable" onClick={() => setSelectedImg(img)}>
-                <img src={`/${img}`} className="w-full h-full object-cover opacity-20 group-hover:opacity-100 transition-opacity" />
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* IMAGES */}
+        <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6">
+          {galleryImages.map((img, i) => (
+            <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable" onClick={() => setSelectedImg(img)}>
+              <img src={`/${img}`} className="w-full h-full object-cover opacity-20 group-hover:opacity-100 transition-opacity" />
+            </div>
+          ))}
+        </div>
       </main>
 
+      {/* FOOTER */}
+      <footer className="fixed bottom-0 w-full z-[60] py-3 bg-black border-t border-white/5 overflow-hidden">
+        <div className="flex whitespace-nowrap animate-marquee text-[9px] text-white/10 tracking-[0.4em] uppercase">
+          <span className="mx-8">AETHER_ARCHIVE // 2025</span> • <span className="mx-8">SIGNAL_STRENGTH: {latency.sora}</span> • <span className="mx-8">AETHER_ARCHIVE // 2025</span>
+        </div>
+      </footer>
+
+      {/* MODALS */}
       <AnimatePresence>
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
             <X className="absolute top-10 right-10 text-white/50 clickable" size={32} onClick={() => setActiveVideo(null)} />
-            <video src={`/${activeVideo}`} controls autoPlay className="max-w-4xl w-full border border-white/10" />
-          </motion.div>
-        )}
-        {selectedImg && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-10" onClick={() => setSelectedImg(null)}>
-            <img src={`/${selectedImg}`} className="max-w-full max-h-full border border-white/10" />
-          </motion.div>
-        )}
-        {isSecretOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] bg-black flex items-center justify-center">
-             <X className="absolute top-10 right-10 text-white/20 clickable" size={32} onClick={() => setIsSecretOpen(false)} />
-             <video src="/secret.mp4" autoPlay className="w-full h-full object-contain" onEnded={() => setIsSecretOpen(false)} />
+            <video src={`/${activeVideo}`} controls autoPlay className="max-w-4xl w-full" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <footer className="fixed bottom-0 w-full z-50 py-3 bg-black border-t border-white/5 overflow-hidden">
-        <div className="flex whitespace-nowrap animate-marquee text-[9px] text-white/10 tracking-[0.4em] uppercase">
-          <span className="mx-8">DYLON MARTINEAU</span> • <span className="mx-8">SORA_ENGINE</span> • <span className="mx-8">GEMINI_CORE</span> • <span className="mx-8">SIGNAL_SYNC</span>
-        </div>
-      </footer>
+      {/* THE CURSOR - PLACED AT THE VERY END TO OVERRIDE EVERYTHING */}
+      <div ref={cursorRef} className="custom-cursor">
+        <div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" />
+      </div>
     </div>
   );
 }

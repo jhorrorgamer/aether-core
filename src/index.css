@@ -1,38 +1,45 @@
 @import "tailwindcss";
 
-html, body {
-  margin: 0; padding: 0;
-  background-color: black;
-  cursor: none !important; 
+/* 1. HIDE DEFAULT CURSOR ON EVERYTHING */
+* {
+  cursor: none !important;
 }
 
-/* --- THE NO-DRIFT CURSOR --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  overflow-x: hidden;
+  /* Important: removing 'height: 100%' from body can fix scroll issues */
+}
+
+/* 2. THE CURSOR STYLING */
 .custom-cursor {
-  position: fixed;
+  position: fixed; /* Relative to window viewport only */
   top: 0;
   left: 0;
   width: 40px;
   height: 40px;
-  pointer-events: none;
-  z-index: 9999;
+  pointer-events: none; /* Allows you to click things underneath */
+  z-index: 999999; /* Higher than everything else */
   mix-blend-mode: difference;
-  /* This ensures the center of the crosshair is at 0,0 */
-  margin-left: -20px; 
-  margin-top: -20px;
-  /* Initial state */
   will-change: transform;
+  /* Starting point outside of screen */
+  transform: translate3d(-100px, -100px, 0);
 }
 
-.cursor-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: white; }
-.cursor-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: white; }
+.cursor-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: white; transform: translateX(-50%); }
+.cursor-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: white; transform: translateY(-50%); }
 .cursor-dot { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
 
-.cursor-hovering .cursor-dot { background: #ff0000; box-shadow: 0 0 10px red; }
+/* 3. HOVER STATE (Controlled via JS class) */
+.custom-cursor.cursor-hovering .cursor-dot {
+  background: red;
+  box-shadow: 0 0 15px red;
+  transform: translate(-50%, -50%) scale(2);
+}
 
-/* Hide system cursor on everything */
-* { cursor: none !important; }
-
-/* --- HUD & FX --- */
+/* 4. UTILITIES */
 .scanline {
   position: fixed; width: 100%; height: 100px;
   background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
@@ -41,26 +48,7 @@ html, body {
 }
 @keyframes scan { from { top: -100px; } to { top: 100vh; } }
 
-.vhs-filter {
-  position: fixed; inset: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-              linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
-  background-size: 100% 2px, 2px 100%;
-  pointer-events: none;
-}
-
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .animate-marquee { animation: marquee 35s linear infinite; width: 200%; }
-
-.jitter-redacted {
-  color: red !important;
-  animation: jitter 0.1s infinite;
-  text-shadow: 2px 0 cyan, -2px 0 magenta;
-}
-@keyframes jitter {
-  0% { transform: translate(0,0); }
-  50% { transform: translate(-2px, 2px); }
-  100% { transform: translate(2px, -2px); }
-}
 
 .dead-pixel { width: 3px; height: 3px; background: red; box-shadow: 0 0 5px red; }
