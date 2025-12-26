@@ -13,7 +13,8 @@ export default function AetherArchive() {
   const [isGlitching, setIsGlitching] = useState(false);
   const [isBreached, setIsBreached] = useState(false);
   const [is404, setIs404] = useState(false);
-  const [isLogsOpen, setIsLogsOpen] = useState(false); // NEW
+  const [isLogsOpen, setIsLogsOpen] = useState(false);
+  const [randomLogs, setRandomLogs] = useState([]); // NEW: State for randomized lore
   const [inputBuffer, setInputBuffer] = useState("");
   const [isSecretOpen, setIsSecretOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
@@ -32,10 +33,22 @@ export default function AetherArchive() {
     "[LOG]: ACCELERATION_BREAKS_REALITY"
   ];
 
+  // LORE DATA: Mentions Dylon Martineau as the lost experiment
+  const logDatabase = [
+    { type: 'error', text: "[SYSTEM]: FATAL_ERROR in Sector_7. Subject 'Dylon Martineau' has exceeded temporal bounds." },
+    { type: 'admin', user: 'ADMIN_01', text: "He wasn't supposed to stay in the render. Why is the Sora engine keeping Dylon? It's like the architecture is feeding off his presence." },
+    { type: 'user', user: 'NULL_RECOVERY', text: "I saw Dylon in Case File 3. He looked at the camera, but his eyes... they weren't digital anymore." },
+    { type: 'admin', user: 'DEPT_CHIEF', text: "Stop the extraction. If we pull Dylon Martineau out now, the entire liminal archive collapses. He's the anchor." },
+    { type: 'system', text: "[ALERT]: subject_martineau_01 status: LOST_IN_TRANSITION." },
+    { type: 'user', user: 'VOICE_09', text: "The mall isn't empty. Dylon is there. He’s been there since the first 2025 generation." },
+    { type: 'admin', user: 'ADMIN_02', text: "We didn't prompt him to be in these videos. The AI is dreaming about Dylon Martineau on its own." },
+    { type: 'error', text: "[CRITICAL]: Subject 'Dylon Martineau' found in non-indexed coordinate: NULL_SPACE." }
+  ];
+
   const audioRef = useRef(null);
   const cursorRef = useRef(null);
   const mousePos = useRef({ x: 0, y: 0 });
-  const idleTimer = useRef(null); // NEW
+  const idleTimer = useRef(null);
 
   const galleryImages = [
     { src: "image1.png", meta: "SEARCH: CASE_FILE_LEVEL_188" }, 
@@ -51,7 +64,6 @@ export default function AetherArchive() {
 
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  // --- NEW: WHISPER SYNTHESIS ---
   const playWhisper = () => {
     if (isMuted) return;
     try {
@@ -69,7 +81,6 @@ export default function AetherArchive() {
     } catch (e) {}
   };
 
-  // --- NEW: IDLE HANDLER ---
   const resetIdleTimer = () => {
     clearTimeout(idleTimer.current);
     idleTimer.current = setTimeout(() => {
@@ -80,6 +91,14 @@ export default function AetherArchive() {
       }
     }, 30000);
   };
+
+  // RANDOMIZE LOGS WHEN OPENED
+  useEffect(() => {
+    if (isLogsOpen) {
+      const shuffled = [...logDatabase].sort(() => 0.5 - Math.random());
+      setRandomLogs(shuffled.slice(0, 5)); // Show 5 random snippets
+    }
+  }, [isLogsOpen]);
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentHint(p => (p + 1) % hints.length), 7000);
@@ -106,7 +125,7 @@ export default function AetherArchive() {
   useEffect(() => {
     const moveCursor = (e) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
-      resetIdleTimer(); // Reset on mouse move
+      resetIdleTimer();
       const hovered = !!e.target.closest('button, a, .clickable, input, textarea, .dead-pixel, img, video');
       if (hovered) cursorRef.current?.classList.add('cursor-hovering');
       else cursorRef.current?.classList.remove('cursor-hovering');
@@ -155,7 +174,7 @@ export default function AetherArchive() {
       if (buffer.endsWith("eyes")) { setIsEasterEgg(true); setTimeout(() => setIsEasterEgg(false), 5000); }
       if (buffer.endsWith("breach")) { setIsBreached(true); setTimeout(() => setIsBreached(false), 8000); }
       if (buffer.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
-      if (buffer.endsWith("logs")) { setIsLogsOpen(true); } // NEW
+      if (buffer.endsWith("logs")) { setIsLogsOpen(true); }
     };
     window.addEventListener("keydown", handleKeys);
     return () => window.removeEventListener("keydown", handleKeys);
@@ -271,7 +290,6 @@ export default function AetherArchive() {
       <div ref={cursorRef} className="custom-cursor"><div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" /></div>
       
       <AnimatePresence>
-        {/* NEW: LOG TERMINAL MODAL */}
         {isLogsOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1000] bg-black/95 flex items-center justify-center p-6 font-mono" onClick={() => setIsLogsOpen(false)}>
             <div className="w-full max-w-2xl border border-white/20 bg-black p-8 shadow-[0_0_50px_rgba(255,255,255,0.05)]" onClick={e => e.stopPropagation()}>
@@ -280,12 +298,16 @@ export default function AetherArchive() {
                 <X className="text-white/20 hover:text-white clickable" onClick={() => setIsLogsOpen(false)} />
               </div>
               <div className="space-y-4 text-[11px] leading-relaxed max-h-[60vh] overflow-y-auto custom-scrollbar pr-4">
-                <p className="text-red-500/80">[SYSTEM]: Warning - unauthorized access detected.</p>
-                <p className="text-white/40"><span className="text-white/60">[ADMIN_01]:</span> The December sequences are different. The Sora engine is rendering rooms that don't have exits.</p>
-                <p className="text-white/40"><span className="text-white/60">[USER_NULL]:</span> I recognized the mall in Case File 5. It was demolished in '98. How is it generating fresh 4K footage of it?</p>
-                <p className="text-white/40"><span className="text-white/60">[ADMIN_01]:</span> Stop looking for logic. The archive isn't just storing these clips, it's expanding them.</p>
-                <p className="text-blue-400/60">[SYSTEM]: Recovering CASE_FILE_NULL_SPACE...</p>
-                <p className="text-white/40"><span className="text-white/60">[USER_NULL]:</span> If the cursor turns red, don't click. It's not a link, it's a breach.</p>
+                {randomLogs.map((log, i) => (
+                  <p key={i} className={`
+                    ${log.type === 'error' ? 'text-red-500/80' : ''}
+                    ${log.type === 'system' ? 'text-blue-400/60' : ''}
+                    ${log.type === 'admin' || log.type === 'user' ? 'text-white/40' : ''}
+                  `}>
+                    {log.user && <span className="text-white/60">[{log.user}]: </span>}
+                    {log.text}
+                  </p>
+                ))}
               </div>
               <div className="mt-8 pt-4 border-t border-white/10 text-[9px] text-white/20 flex justify-between uppercase">
                 <span>SIGNAL_ENCRYPTED</span>
