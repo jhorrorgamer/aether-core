@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { X, Maximize2, Youtube, MonitorPlay } from "lucide-react";
@@ -15,28 +15,27 @@ export default function AetherArchive() {
   const [audioLevel, setAudioLevel] = useState(0);
   const audioRef = useRef(null);
   const analyserRef = useRef(null);
+  const cursorRef = useRef(null);
 
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  // --- CURSOR FIX: VIEWPORT TRACKING ---
-  const mouseX = useMotionValue(-100);
-  const mouseY = useMotionValue(-100);
-  const springX = useSpring(mouseX, { damping: 40, stiffness: 600 });
-  const springY = useSpring(mouseY, { damping: 40, stiffness: 600 });
-
+  // --- ULTIMATE CURSOR FIX ---
   useEffect(() => {
-    const move = (e) => {
-      // clientX/Y tracks relative to the window, not the page height
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
+    const moveCursor = (e) => {
+      if (cursorRef.current) {
+        // We use requestAnimationFrame to ensure it moves at the screen's refresh rate
+        requestAnimationFrame(() => {
+          cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+        });
+      }
       setIsHovering(!!e.target.closest('button, a, .clickable, .dead-pixel, img, video'));
     };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, [mouseX, mouseY]);
 
-  // --- AUDIO INITIALIZATION ---
+    window.addEventListener("mousemove", moveCursor);
+    return () => window.removeEventListener("mousemove", moveCursor);
+  }, []);
+
   const initAudio = () => {
     if (analyserRef.current) return;
     const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -88,7 +87,7 @@ export default function AetherArchive() {
 
   return (
     <div 
-      className="relative min-h-screen w-full bg-black overflow-hidden font-mono text-white transition-all" 
+      className="relative min-h-screen w-full bg-black overflow-x-hidden font-mono text-white transition-all" 
       onClick={handleInteraction}
       style={{
         filter: `contrast(${100 + audioLevel * 30}%)`,
@@ -97,22 +96,20 @@ export default function AetherArchive() {
     >
       <audio ref={audioRef} src="/music.mp3" loop />
 
-      {/* THE FIXED CURSOR */}
-      <motion.div 
-        className={`custom-cursor ${isHovering ? 'cursor-hovering' : ''}`} 
-        style={{ left: springX, top: springY }}
+      {/* THE CURSOR (REF BASED FOR ZERO DRIFT) */}
+      <div 
+        ref={cursorRef}
+        className={`custom-cursor ${isHovering ? 'cursor-hovering' : ''}`}
       >
         <div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" />
-      </motion.div>
+      </div>
 
-      {/* BACKGROUNDS */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-500 ${isEasterEgg ? 'opacity-0' : 'opacity-25'}`} />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
         <div className="vhs-filter" />
       </div>
 
-      {/* HUD */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
@@ -148,7 +145,6 @@ export default function AetherArchive() {
           </a>
         </div>
 
-        {/* SORA CREATIONS */}
         <section className="w-full max-w-6xl px-6 mb-32">
           <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2">Sora Creations</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -160,7 +156,6 @@ export default function AetherArchive() {
           </div>
         </section>
 
-        {/* DATA LOGS */}
         <section className="w-full max-w-6xl px-6">
           <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2">Data Logs</h2>
           <div className="grid grid-cols-3 gap-3">
@@ -173,7 +168,6 @@ export default function AetherArchive() {
         </section>
       </main>
 
-      {/* MODALS */}
       <AnimatePresence>
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
@@ -196,7 +190,7 @@ export default function AetherArchive() {
 
       <footer className="fixed bottom-0 w-full z-50 py-3 bg-black border-t border-white/5 overflow-hidden">
         <div className="flex whitespace-nowrap animate-marquee text-[9px] text-white/10 tracking-[0.4em] uppercase">
-          <span className="mx-8">DYLON MARTINEAU // @JHORRORGAMER</span> • <span className="mx-8">SORA_ENGINE</span> • <span className="mx-8">GEMINI_CORE</span> • <span className="mx-8">AETHER_ARCHIVE</span>
+          <span className="mx-8">DYLON MARTINEAU</span> • <span className="mx-8">SORA_ENGINE</span> • <span className="mx-8">GEMINI_CORE</span> • <span className="mx-8">SIGNAL_SYNC</span>
         </div>
       </footer>
     </div>

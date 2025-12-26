@@ -3,19 +3,24 @@
 html, body {
   margin: 0; padding: 0;
   background-color: black;
-  cursor: none !important; /* Hides the real mouse */
-  overflow-x: hidden;
+  cursor: none !important; 
 }
 
-/* --- THE FIX: FIXED POSITIONING --- */
+/* --- THE NO-DRIFT CURSOR --- */
 .custom-cursor {
-  position: fixed; /* Relative to window, ignores scroll */
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 40px;
   height: 40px;
   pointer-events: none;
   z-index: 9999;
   mix-blend-mode: difference;
-  transform: translate(-50%, -50%); /* Centers cursor on mouse tip */
+  /* This ensures the center of the crosshair is at 0,0 */
+  margin-left: -20px; 
+  margin-top: -20px;
+  /* Initial state */
+  will-change: transform;
 }
 
 .cursor-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: white; }
@@ -23,6 +28,9 @@ html, body {
 .cursor-dot { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
 
 .cursor-hovering .cursor-dot { background: #ff0000; box-shadow: 0 0 10px red; }
+
+/* Hide system cursor on everything */
+* { cursor: none !important; }
 
 /* --- HUD & FX --- */
 .scanline {
@@ -55,7 +63,4 @@ html, body {
   100% { transform: translate(2px, -2px); }
 }
 
-.dead-pixel { width: 3px; height: 3px; background: red; box-shadow: 0 0 5px red; cursor: none !important; }
-
-/* Forces system cursor hidden on interactive items */
-a, button, .clickable, img, video { cursor: none !important; }
+.dead-pixel { width: 3px; height: 3px; background: red; box-shadow: 0 0 5px red; }
