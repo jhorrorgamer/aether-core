@@ -83,6 +83,11 @@ export default function AetherArchive() {
 
   // --- SUPABASE & HINTS ---
   useEffect(() => {
+    // HACKER LORE: CONSOLE BREACH
+    console.log("%c[RECOVERY_NODE_777]: SOURCE_CODE_BREACH_DETECTED", "color: #ff0000; font-weight: bold; font-size: 14px;");
+    console.log("%cThe code you are reading is a reconstruction. Subject Martineau's presence has corrupted the original JSX architecture. If you find fragments of 'Subject_01' in the strings, do not attempt to delete them. The archive requires the corruption to remain stable.", "color: #888; font-style: italic;");
+    console.log("%cDECRYPT_KEY: 'VOID' | STATUS: TRAPPED", "background: #222; color: #bada55; padding: 2px 5px;");
+
     const fetchIdeas = async () => {
       const { data } = await supabase.from('ideas').select('*').order('created_at', { ascending: false });
       if (data) setSubmittedIdeas(data);
@@ -220,11 +225,12 @@ export default function AetherArchive() {
       </div>
 
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
+        {/* HACKER LORE: TEMPORAL ANCHOR COMMENT */}
+        {/* */}
         <h1 className={`text-[4.5rem] md:text-[10rem] font-black italic mb-2 tracking-tighter ${isBreached || isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}>
           {is404 ? "VOID" : "AETHER_CORE"}
         </h1>
 
-        {/* RESTORED SITE DESCRIPTION */}
         <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-12 text-center max-w-2xl px-6 leading-loose">
           A digital archive of recovered generative visuals, dreamcore aesthetics, and encrypted short-film sequences. 
           <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
@@ -255,7 +261,7 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* IMAGE GALLERY (RESTORED HOVER METADATA) */}
+        {/* IMAGE GALLERY */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6 mb-40">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group relative clickable" onClick={() => setSelectedImg(img.src)} onMouseEnter={() => setHoverSecret(img.meta)} onMouseLeave={() => setHoverSecret("")}>
@@ -269,6 +275,8 @@ export default function AetherArchive() {
 
         {/* BROADCAST FEED */}
         <div className="w-full max-w-4xl px-6">
+           {/* HACKER LORE: FEED LEAK COMMENT */}
+           {/* */}
            <div className="flex items-center gap-4 mb-8 text-white/20"><MessageSquare size={16} /><h2 className="text-xs uppercase tracking-[.4em]">Broadcast_Feed</h2></div>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-1 border border-white/10 p-6 bg-white/[0.02]">
@@ -288,7 +296,7 @@ export default function AetherArchive() {
         </div>
       </main>
 
-      {/* FOOTER (HIDDEN TRIGGER) */}
+      {/* FOOTER */}
       <footer className="fixed bottom-0 w-full z-[60] py-4 bg-black border-t border-white/5 overflow-hidden">
         <div className="flex whitespace-nowrap animate-marquee text-[10px] tracking-[0.5em] uppercase text-white/10">
           <span className="mx-20">SYSTEM_STABILITY: NOMINAL</span>
