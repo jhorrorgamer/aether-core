@@ -11,7 +11,7 @@ html, body {
   scroll-behavior: smooth;
 }
 
-/* --- THE CURSOR wrapper (Fixed Position) --- */
+/* --- THE CURSOR wrapper --- */
 .custom-cursor {
   position: fixed;
   top: 0;
@@ -55,6 +55,44 @@ html, body {
 
 .jitter-redacted { color: #ff0000 !important; text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff; animation: jitter 0.05s infinite; }
 @keyframes jitter { 0% { skew: 5deg; } 100% { skew: -5deg; } }
+
+/* --- DATA EXTRACTION OVERLAY --- */
+.data-leak-bg {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 0, 0, 0.03) 0px,
+    rgba(255, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 40;
+  animation: slide-up 10s linear infinite;
+}
+
+@keyframes slide-up {
+  from { background-position: 0 0; }
+  to { background-position: 0 -100px; }
+}
+
+/* --- NEURAL SCAN EFFECT --- */
+.corruption-scanner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 0, 0, 0.5);
+  box-shadow: 0 0 15px red;
+  animation: scan 1.5s linear infinite;
+}
+
+@keyframes scan {
+  from { top: 0%; }
+  to { top: 100%; }
+}
 
 .vertical-video-container { height: 90vh; aspect-ratio: 9 / 16; background: black; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); }
 

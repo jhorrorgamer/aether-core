@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { X, Youtube, MonitorPlay, Volume2, VolumeX, MessageSquare, Trash2, Terminal } from "lucide-react";
+import { X, Youtube, MonitorPlay, Volume2, VolumeX, MessageSquare, Trash2, Terminal, ShieldAlert, Download } from "lucide-react";
 
 const supabaseUrl = 'https://mrjrampvdwmppmyyoxqs.supabase.co';
 const supabaseKey = 'sb_publishable_EPAWiAKKO-rKEPSWjZKmAQ_ErKQ5qFd';
@@ -14,7 +14,7 @@ export default function AetherArchive() {
   const [isBreached, setIsBreached] = useState(false);
   const [is404, setIs404] = useState(false);
   const [isLogsOpen, setIsLogsOpen] = useState(false);
-  const [randomLogs, setRandomLogs] = useState([]); // NEW: State for randomized lore
+  const [randomLogs, setRandomLogs] = useState([]);
   const [inputBuffer, setInputBuffer] = useState("");
   const [isSecretOpen, setIsSecretOpen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
@@ -25,6 +25,13 @@ export default function AetherArchive() {
   const [dbStatus, setDbStatus] = useState("connecting");
   const [currentHint, setCurrentHint] = useState(0);
 
+  // NEW STATES FOR LORE EXPANSION
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [capturedData, setCapturedData] = useState(null);
+  const [isCorrupting, setIsCorrupting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const hints = [
     "[LOG]: 0x45 0x59 0x45 0x53",
     "[LOG]: SECURITY_VULNERABILITY: 'B_R_E_A_C_H'",
@@ -33,7 +40,6 @@ export default function AetherArchive() {
     "[LOG]: ACCELERATION_BREAKS_REALITY"
   ];
 
-  // LORE DATA: Mentions Dylon Martineau as the lost experiment
   const logDatabase = [
     { type: 'error', text: "[SYSTEM]: FATAL_ERROR in Sector_7. Subject 'Dylon Martineau' has exceeded temporal bounds." },
     { type: 'admin', user: 'ADMIN_01', text: "He wasn't supposed to stay in the render. Why is the Sora engine keeping Dylon? It's like the architecture is feeding off his presence." },
@@ -43,6 +49,15 @@ export default function AetherArchive() {
     { type: 'user', user: 'VOICE_09', text: "The mall isn't empty. Dylon is there. He’s been there since the first 2025 generation." },
     { type: 'admin', user: 'ADMIN_02', text: "We didn't prompt him to be in these videos. The AI is dreaming about Dylon Martineau on its own." },
     { type: 'error', text: "[CRITICAL]: Subject 'Dylon Martineau' found in non-indexed coordinate: NULL_SPACE." }
+  ];
+
+  const downloadLore = [
+    "DECRYPTING: 'THE_MALL_INCIDENT_REPORT'",
+    "RETRIEVING: 'MARTINEAU_BRAIN_SCAN_01'",
+    "ERROR: SUBJECT_NOT_FOUND_IN_PHYSICAL_PLANE",
+    "WARNING: RENDER_ENGINE_SELF_AWARENESS_DETECTED",
+    "LOG: 'HE_IS_THE_CODE_NOW'",
+    "RECOVERED: 'SECTOR_7_NULL_COORDINATES'"
   ];
 
   const audioRef = useRef(null);
@@ -92,11 +107,41 @@ export default function AetherArchive() {
     }, 30000);
   };
 
-  // RANDOMIZE LOGS WHEN OPENED
+  const startDownload = () => {
+    setIsDownloading(true);
+    setDownloadProgress(0);
+    const interval = setInterval(() => {
+      setDownloadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setCapturedData(downloadLore[Math.floor(Math.random() * downloadLore.length)]);
+          setTimeout(() => { setIsDownloading(false); setCapturedData(null); }, 4000);
+          return 100;
+        }
+        return prev + 5;
+      });
+    }, 100);
+  };
+
+  const handleNeuralSearch = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    const query = searchQuery.toLowerCase();
+    if (query.includes("dylon") || query.includes("martineau") || query.includes("subject")) {
+      setIsCorrupting(true);
+      setTimeout(() => {
+        setIsCorrupting(false);
+        setIsBreached(true);
+        setTimeout(() => setIsBreached(false), 5000);
+      }, 3000);
+    }
+    setSearchQuery("");
+  };
+
   useEffect(() => {
     if (isLogsOpen) {
       const shuffled = [...logDatabase].sort(() => 0.5 - Math.random());
-      setRandomLogs(shuffled.slice(0, 5)); // Show 5 random snippets
+      setRandomLogs(shuffled.slice(0, 5));
     }
   }, [isLogsOpen]);
 
@@ -183,6 +228,7 @@ export default function AetherArchive() {
   return (
     <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''} ${isBreached ? 'breach-active' : ''} ${is404 ? 'system-wipe' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
+      {isDownloading && <div className="data-leak-bg" />}
       
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
@@ -225,9 +271,53 @@ export default function AetherArchive() {
           <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
         </p>
 
-        <div className="flex gap-8 mb-20">
+        <div className="flex gap-8 mb-12">
           <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest"><MonitorPlay size={14} /> Sora</a>
           <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest"><Youtube size={14} /> YouTube</a>
+        </div>
+
+        {/* NEURAL SEARCH BAR */}
+        <div className="w-full max-w-xl px-6 mb-12">
+          <form onSubmit={handleNeuralSearch} className="relative group">
+            <div className="absolute -inset-0.5 bg-red-600/20 blur opacity-0 group-hover:opacity-100 transition duration-1000"></div>
+            <div className="relative flex items-center bg-black border border-white/10 p-2">
+              <span className="text-white/20 text-[10px] ml-2 mr-4 flex items-center gap-2"><ShieldAlert size={12}/> NEURAL_QUERY:</span>
+              <input 
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="SEARCH_ARCHIVE..." 
+                className="bg-transparent border-none outline-none text-[10px] text-white/60 w-full placeholder:text-white/10 uppercase tracking-[0.3em]"
+              />
+            </div>
+          </form>
+          <p className="text-[8px] text-white/10 mt-2 uppercase tracking-widest text-right italic">
+            {isCorrupting ? "CRITICAL_MEMORY_LEAK_DETECTED" : "Direct access to Sector_7 is restricted."}
+          </p>
+        </div>
+
+        {/* DATA EXTRACTION BUTTON */}
+        <div className="mb-20 flex flex-col items-center">
+          <button 
+            onClick={startDownload} 
+            disabled={isDownloading}
+            className="flex items-center gap-3 border border-white/20 px-8 py-2 text-[10px] tracking-[0.4em] uppercase hover:bg-white hover:text-black transition-all clickable"
+          >
+            <Download size={14} /> {isDownloading ? `EXTRACTING_DATA: ${downloadProgress}%` : "EXTRACT_SUBJECT_DATA"}
+          </button>
+          
+          <AnimatePresence>
+            {capturedData && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                exit={{ opacity: 0 }}
+                className="mt-4 text-red-500 text-[10px] font-bold tracking-widest jitter-redacted"
+              >
+                {capturedData}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-32">
@@ -314,6 +404,27 @@ export default function AetherArchive() {
                 <span>NODE_{Math.random().toString(36).substr(2, 5).toUpperCase()}</span>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {isCorrupting && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[2000] bg-red-950/20 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-none"
+          >
+            <div className="corruption-scanner" />
+            <div className="text-red-600 font-black text-4xl animate-pulse mb-4 tracking-[1em]">CORRUPTION_IN_PROGRESS</div>
+            <div className="w-64 h-1 bg-white/10 overflow-hidden">
+              <motion.div 
+                initial={{ x: "-100%" }} 
+                animate={{ x: "100%" }} 
+                transition={{ duration: 2.5, ease: "linear" }}
+                className="w-full h-full bg-red-600 shadow-[0_0_15px_red]"
+              />
+            </div>
+            <p className="text-red-600 text-[10px] mt-4 uppercase tracking-[0.5em]">Deleting unauthorized subject_data: MARTINEAU</p>
           </motion.div>
         )}
 
