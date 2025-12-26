@@ -11,15 +11,16 @@ html, body {
   overflow-x: hidden;
 }
 
-/* --- VIDEO MODAL: 1080x1920 (9:16) --- */
+/* --- VERTICAL VIDEO MODAL (1080x1920) --- */
 .vertical-video-container {
-  height: 90vh; /* Scaled to fit screen height */
-  aspect-ratio: 9 / 16; /* Forced 1080x1920 ratio */
+  height: 90vh;
+  aspect-ratio: 9 / 16;
   background: black;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-shadow: 0 0 40px rgba(0,0,0,0.5);
 }
 
 /* --- THE CENTERED CROSSHAIR --- */
@@ -43,7 +44,7 @@ html, body {
   transform: translate(-50%, -50%) scale(2.5);
 }
 
-/* --- SYSTEM CRASH & HORROR EFFECTS --- */
+/* --- HORROR EFFECTS --- */
 .screen-shake {
   animation: shake 0.12s infinite !important;
   filter: contrast(2) saturate(0) brightness(1.2) !important;
@@ -70,7 +71,7 @@ html, body {
   100% { transform: translate(0,0); }
 }
 
-/* --- ATMOSPHERIC LAYERS --- */
+/* --- LAYERS & SCANLINES --- */
 .vhs-filter {
   position: fixed; inset: 0;
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
@@ -87,7 +88,7 @@ html, body {
 }
 @keyframes scan { from { top: -100px; } to { top: 100vh; } }
 
-/* MARQUEE: Slow & Seamless */
+/* SEAMLESS MARQUEE */
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
@@ -101,7 +102,7 @@ html, body {
 
 .backdrop-blur-md { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 
-/* --- INTERACTION --- */
+/* INTERACTION */
 .clickable { transition: transform 0.1s ease; }
 .clickable:active { transform: scale(0.95); }
 

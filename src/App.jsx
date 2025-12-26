@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
-import { X, Youtube, MonitorPlay, Volume2, VolumeX, Terminal } from "lucide-react";
+import { X, Youtube, MonitorPlay, Volume2, VolumeX, Terminal, FileText, Database } from "lucide-react";
 
 export default function AetherArchive() {
   const [selectedImg, setSelectedImg] = useState(null);
@@ -18,7 +18,12 @@ export default function AetherArchive() {
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  // Audio management: Pauses BG music when any video is playing
+  // New Content: Sequence Logs
+  const transmissions = [
+    { id: "01", title: "THE_VOID_PROTOCOL", body: "Initial testing of Sora generative vectors. Reality stability at 42%." },
+    { id: "02", title: "DREAM_LOG_SEQUENCE", body: "Visual sequences recovered from the December 2025 batch. High grain detected." }
+  ];
+
   useEffect(() => {
     if (audioRef.current) {
       if (activeVideo || isSecretOpen) {
@@ -29,7 +34,6 @@ export default function AetherArchive() {
     }
   }, [activeVideo, isSecretOpen, isMuted]);
 
-  // CMD Console Logic
   useEffect(() => {
     const messages = ["[WARN]: DATA_LEAK", "[INFO]: SCANNING_VOID...", "[SYSTEM]: ENTITY_DETECTED", "[LOG]: MEMORY_404", "[VOID]: IT_WATCHES"];
     const interval = setInterval(() => {
@@ -38,7 +42,6 @@ export default function AetherArchive() {
     return () => clearInterval(interval);
   }, []);
 
-  // Keyboard Listener (404 and EYES)
   useEffect(() => {
     const handleKeys = (e) => {
       const char = e.key.toLowerCase();
@@ -61,7 +64,6 @@ export default function AetherArchive() {
     }
   }, [inputBuffer]);
 
-  // Centered Cursor Logic
   useEffect(() => {
     const cursor = cursorRef.current;
     if (!cursor) return;
@@ -86,7 +88,6 @@ export default function AetherArchive() {
     <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''}`} onClick={() => !activeVideo && audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
 
-      {/* Background Layers */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
@@ -106,7 +107,6 @@ export default function AetherArchive() {
         </div>
       </div>
 
-      {/* HUD Headers */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
@@ -146,6 +146,7 @@ export default function AetherArchive() {
           </p>
         </div>
 
+        {/* Video Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-20">
           {soraVideos.map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -154,6 +155,28 @@ export default function AetherArchive() {
           ))}
         </div>
 
+        {/* --- NEW SECTION: DATA TRANSMISSIONS --- */}
+        <div className="w-full max-w-4xl px-6 mb-20">
+           <div className="flex items-center gap-4 mb-8 text-white/20">
+              <Database size={16} />
+              <h2 className="text-xs uppercase tracking-[.4em]">Recovered_Transmissions</h2>
+              <div className="h-[1px] flex-grow bg-white/5" />
+           </div>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {transmissions.map((log) => (
+                <div key={log.id} className="p-6 border border-white/5 bg-white/[0.02] group hover:border-white/20 transition-all clickable">
+                  <div className="flex justify-between items-start mb-4">
+                    <FileText size={14} className="text-white/20 group-hover:text-white" />
+                    <span className="text-[8px] text-white/10 font-bold">LOG_{log.id}</span>
+                  </div>
+                  <h3 className="text-[10px] mb-2 tracking-widest group-hover:text-red-600 transition-colors">{log.title}</h3>
+                  <p className="text-[9px] text-white/30 leading-relaxed font-mono italic">"{log.body}"</p>
+                </div>
+              ))}
+           </div>
+        </div>
+
+        {/* Image Grid */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable" onClick={() => setSelectedImg(img)}>
@@ -184,15 +207,8 @@ export default function AetherArchive() {
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
             <X className="absolute top-10 right-10 text-white/50 clickable z-[110]" size={32} onClick={() => setActiveVideo(null)} />
-            <div className="vertical-video-container border border-white/10 shadow-[0_0_50px_rgba(255,255,255,0.05)]">
-               <video 
-                 src={`/${activeVideo}`} 
-                 controls 
-                 autoPlay 
-                 loop 
-                 playsInline 
-                 className="w-full h-full object-cover" 
-               />
+            <div className="vertical-video-container border border-white/10">
+               <video src={`/${activeVideo}`} controls autoPlay loop playsInline className="w-full h-full object-cover" />
             </div>
           </motion.div>
         )}
