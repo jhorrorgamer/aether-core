@@ -20,7 +20,7 @@ export default function AetherArchive() {
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  // --- AI LATENCY SIMULATOR ---
+  // AI Latency Simulator
   useEffect(() => {
     const interval = setInterval(() => {
       setLatency({
@@ -31,7 +31,7 @@ export default function AetherArchive() {
     return () => clearInterval(interval);
   }, []);
 
-  // --- AUTO-PAUSE MUSIC ON VIDEO ---
+  // Music Management (Pauses when video is open)
   useEffect(() => {
     if (audioRef.current) {
       if (activeVideo || isSecretOpen) {
@@ -42,12 +42,14 @@ export default function AetherArchive() {
     }
   }, [activeVideo, isSecretOpen, isMuted]);
 
-  // --- CURSOR ENGINE ---
+  // Centered Cursor Logic
   useEffect(() => {
     const cursor = cursorRef.current;
     if (!cursor) return;
     const moveCursor = (e) => {
-      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+      requestAnimationFrame(() => {
+        cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+      });
       const hovered = !!e.target.closest('button, a, .clickable, .dead-pixel, img, video');
       if (hovered) cursor.classList.add('cursor-hovering');
       else cursor.classList.remove('cursor-hovering');
@@ -56,7 +58,7 @@ export default function AetherArchive() {
     return () => window.removeEventListener("mousemove", moveCursor);
   }, []);
 
-  // --- AUDIO ANALYSIS ---
+  // Audio Visualizer Setup
   const initAudio = () => {
     if (analyserRef.current) return;
     const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -80,10 +82,7 @@ export default function AetherArchive() {
     e.stopPropagation();
     const newMuted = !isMuted;
     setIsMuted(newMuted);
-    if (audioRef.current) {
-      audioRef.current.muted = newMuted;
-      if (!newMuted) audioRef.current.play();
-    }
+    if (audioRef.current) audioRef.current.muted = newMuted;
   };
 
   const handleInteraction = () => {
@@ -91,6 +90,7 @@ export default function AetherArchive() {
     initAudio();
   };
 
+  // Eyes Easter Egg
   useEffect(() => {
     const handleKeys = (e) => {
       const newBuf = (inputBuffer + e.key.toLowerCase()).slice(-4);
@@ -109,7 +109,7 @@ export default function AetherArchive() {
     <div className="relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden" onClick={handleInteraction}>
       <audio ref={audioRef} src="/music.mp3" loop />
 
-      {/* BACKGROUNDS */}
+      {/* Background Layers */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div 
           className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} 
@@ -119,7 +119,7 @@ export default function AetherArchive() {
         <div className="vhs-filter" />
       </div>
 
-      {/* HUD & CONTROLS */}
+      {/* HUD Header */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
@@ -145,12 +145,12 @@ export default function AetherArchive() {
         <div className="scanline" style={{ opacity: 0.1 + audioLevel * 0.2 }} />
       </div>
 
+      {/* Main Content */}
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
         <h1 className={`text-[4.5rem] md:text-[9rem] font-black italic mb-4 transition-all select-none ${isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}>
           {isEasterEgg ? "REDACTED" : "AETHER_CORE"}
         </h1>
 
-        {/* SOCIAL LINKS */}
         <div className="flex gap-8 mb-10">
           <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest">
             <MonitorPlay size={14} /> Sora Profile
@@ -160,7 +160,6 @@ export default function AetherArchive() {
           </a>
         </div>
 
-        {/* RESTORED DESCRIPTION */}
         <div className="max-w-xl text-center mb-20 px-6">
           <p className="text-[10px] leading-relaxed text-white/30 uppercase tracking-[0.2em] italic">
             "Recovered data from a fragmented reality. This archive serves as a digital vessel for visual experiments, 
@@ -169,7 +168,6 @@ export default function AetherArchive() {
           </p>
         </div>
 
-        {/* SORA CREATIONS GRID */}
         <section className="w-full max-w-6xl px-6 mb-32">
           <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2">Sora Creations</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -181,7 +179,6 @@ export default function AetherArchive() {
           </div>
         </section>
 
-        {/* DATA LOGS GRID */}
         <section className="w-full max-w-6xl px-6">
           <h2 className="text-white/20 text-[10px] uppercase tracking-[0.5em] mb-8 border-b border-white/5 pb-2">Data Logs</h2>
           <div className="grid grid-cols-3 gap-2">
@@ -194,7 +191,7 @@ export default function AetherArchive() {
         </section>
       </main>
 
-      {/* MARQUEE FOOTER */}
+      {/* Scrolling Footer */}
       <footer className="fixed bottom-0 w-full z-[60] py-3 bg-black border-t border-white/5 overflow-hidden">
         <div className={`flex whitespace-nowrap animate-marquee text-[9px] tracking-[0.4em] uppercase ${isEasterEgg ? 'text-red-600' : 'text-white/10'}`}>
           <span className="mx-8">DYLON MARTINEAU // @JHORRORGAMER</span> • 
@@ -204,6 +201,7 @@ export default function AetherArchive() {
         </div>
       </footer>
 
+      {/* Modals */}
       <AnimatePresence>
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
