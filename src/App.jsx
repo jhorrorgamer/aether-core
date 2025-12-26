@@ -35,16 +35,17 @@ export default function AetherArchive() {
   const cursorRef = useRef(null);
   const mousePos = useRef({ x: 0, y: 0 });
 
+  // REPLACED COORDS WITH SEARCHABLE CASE FILES
   const galleryImages = [
-    { src: "image1.png", meta: "40.2525° N, 58.4398° E" }, 
-    { src: "image2.png", meta: "37.3184° N, 121.9511° W" }, 
-    { src: "image3.png", meta: "32.6277° N, 129.7385° E" }, 
-    { src: "image4.png", meta: "SEQ: 004812" },
-    { src: "image5.png", meta: "VOID_STAMP_77" }, 
-    { src: "image6.png", meta: "48.8529° N, 2.3500° E" }, 
-    { src: "image7.png", meta: "LAT: -24.5246" }, 
-    { src: "image8.png", meta: "LONG: 15.4673" },
-    { src: "image9.png", meta: "NULL_VOT_9" }
+    { src: "image1.png", meta: "SEARCH: CASE_FILE_LEVEL_188" }, 
+    { src: "image2.png", meta: "SEARCH: CASE_FILE_LEVEL_0" }, 
+    { src: "image3.png", meta: "SEARCH: CASE_FILE_WINDOW_VOID" }, 
+    { src: "image4.png", meta: "SEARCH: CASE_FILE_TRANSITION" },
+    { src: "image5.png", meta: "SEARCH: CASE_FILE_EMPTY_MALL" }, 
+    { src: "image6.png", meta: "SEARCH: CASE_FILE_DREAM_POOL" }, 
+    { src: "image7.png", meta: "SEARCH: CASE_FILE_ECHO_HALL" }, 
+    { src: "image8.png", meta: "SEARCH: CASE_FILE_STATIC_TV" },
+    { src: "image9.png", meta: "SEARCH: CASE_FILE_NULL_SPACE" }
   ];
 
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
@@ -164,12 +165,10 @@ export default function AetherArchive() {
       </div>
 
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
-        {/* MAIN TITLE */}
         <h1 className={`text-[4.5rem] md:text-[9rem] font-black italic mb-2 transition-all tracking-tighter ${isEasterEgg || isBreached ? 'jitter-redacted' : 'text-white/10'}`}>
           {is404 ? "VOID" : (isBreached ? "ACCESS_DENIED" : (isEasterEgg ? "REDACTED" : "AETHER_CORE"))}
         </h1>
 
-        {/* RESTORED DESCRIPTION */}
         <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-12 text-center max-w-2xl px-6 leading-loose">
           A digital archive of recovered generative visuals, dreamcore aesthetics, and encrypted short-film sequences. 
           <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
@@ -180,7 +179,6 @@ export default function AetherArchive() {
           <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest"><Youtube size={14} /> YouTube</a>
         </div>
 
-        {/* VIDEO GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-32">
           {soraVideos.map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -189,19 +187,17 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* IMAGE GALLERY */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6 mb-40">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group relative clickable" onClick={() => setSelectedImg(img.src)} onMouseEnter={() => setHoverSecret(img.meta)} onMouseLeave={() => setHoverSecret("")}>
               <img src={`/${img.src}`} className="w-full h-full object-cover opacity-20 group-hover:opacity-100 grayscale hover:grayscale-0 transition-all" />
-              <div className="absolute top-2 right-2 text-[7px] text-white/0 group-hover:text-white/20 transition-opacity font-mono">
+              <div className="absolute top-2 right-2 text-[7px] text-white/0 group-hover:text-white/40 transition-opacity font-mono">
                 {img.meta}
               </div>
             </div>
           ))}
         </div>
 
-        {/* BROADCAST FEED */}
         <div className="w-full max-w-4xl px-6">
            <div className="flex items-center gap-4 mb-8 text-white/20">
               <MessageSquare size={16} />
@@ -240,7 +236,6 @@ export default function AetherArchive() {
         </div>
       </footer>
 
-      {/* CURSOR COMPONENT */}
       <div ref={cursorRef} className="custom-cursor"><div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" /></div>
       
       <AnimatePresence>
