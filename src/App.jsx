@@ -20,7 +20,7 @@ export default function AetherArchive() {
   const [isSecretOpen, setIsSecretOpen] = useState(false);
   const [isHiddenOpen, setIsHiddenOpen] = useState(false);
   const [isScientistOpen, setIsScientistOpen] = useState(false); 
-  const [isNotesOpen, setIsNotesOpen] = useState(false); // NEW: State for scientists' notes
+  const [isNotesOpen, setIsNotesOpen] = useState(false); 
   const [activeVideo, setActiveVideo] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [hoverSecret, setHoverSecret] = useState("");
@@ -152,6 +152,24 @@ export default function AetherArchive() {
   };
 
   useEffect(() => {
+    // SECURITY: Block Inspect shortcuts and right-click
+    const blockContext = (e) => e.preventDefault();
+    const blockInspect = (e) => {
+        if (e.key === "F12" || (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) || (e.ctrlKey && e.key === "U")) {
+            e.preventDefault();
+            setIsGlitching(true);
+            setTimeout(() => setIsGlitching(false), 300);
+        }
+    };
+    window.addEventListener("contextmenu", blockContext);
+    window.addEventListener("keydown", blockInspect);
+    return () => {
+        window.removeEventListener("contextmenu", blockContext);
+        window.removeEventListener("keydown", blockInspect);
+    };
+  }, []);
+
+  useEffect(() => {
     if (isLogsOpen) {
       const shuffled = [...logDatabase].sort(() => 0.5 - Math.random());
       setRandomLogs(shuffled.slice(0, 5));
@@ -173,11 +191,6 @@ export default function AetherArchive() {
       } catch (err) { setDbStatus("offline"); }
     };
     fetchIdeas();
-    const channel = supabase.channel('db').on('postgres_changes', { event: '*', schema: 'public', table: 'ideas' }, (p) => {
-      if (p.eventType === 'INSERT') setSubmittedIdeas(prev => [p.new, ...prev]);
-      if (p.eventType === 'DELETE') setSubmittedIdeas(prev => prev.filter(i => i.id !== p.old.id));
-    }).subscribe();
-    return () => supabase.removeChannel(channel);
   }, []);
 
   useEffect(() => {
@@ -187,6 +200,12 @@ export default function AetherArchive() {
       const hovered = !!e.target.closest('button, a, .clickable, input, textarea, .dead-pixel, img, video');
       if (hovered) cursorRef.current?.classList.add('cursor-hovering');
       else cursorRef.current?.classList.remove('cursor-hovering');
+      
+      // RESTORED: Mouse glitch on fast movement
+      if (Math.abs(e.movementX) > 130) {
+        setIsGlitching(true);
+        setTimeout(() => setIsGlitching(false), 100);
+      }
     };
 
     const updateCursor = () => {
@@ -229,7 +248,7 @@ export default function AetherArchive() {
       if (buffer.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
       if (buffer.endsWith("logs")) { setIsLogsOpen(true); }
       if (buffer.endsWith("wire")) { setIsWireframe(!isWireframe); }
-      if (buffer.endsWith("notes")) { setIsNotesOpen(true); } // Secret Notes shortcut
+      if (buffer.endsWith("notes")) { setIsNotesOpen(true); } 
     };
     window.addEventListener("keydown", handleKeys);
     return () => window.removeEventListener("keydown", handleKeys);
@@ -290,7 +309,6 @@ export default function AetherArchive() {
           <a href="https://www.youtube.com/@JhorrorGamer" target="_blank" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-red-500 clickable uppercase tracking-widest"><Youtube size={14} /> YouTube</a>
         </div>
 
-        {/* NEURAL SEARCH BAR */}
         <div className="w-full max-w-xl px-6 mb-12">
           <form onSubmit={handleNeuralSearch} className="relative group">
             <div className="absolute -inset-0.5 bg-red-600/20 blur opacity-0 group-hover:opacity-100 transition duration-1000"></div>
@@ -311,22 +329,13 @@ export default function AetherArchive() {
         </div>
 
         <div className="mb-20 flex flex-col items-center">
-          <button 
-            onClick={startDownload} 
-            disabled={isDownloading}
-            className="flex items-center gap-3 border border-white/20 px-8 py-2 text-[10px] tracking-[0.4em] uppercase hover:bg-white hover:text-black transition-all clickable"
-          >
+          <button onClick={startDownload} disabled={isDownloading} className="flex items-center gap-3 border border-white/20 px-8 py-2 text-[10px] tracking-[0.4em] uppercase hover:bg-white hover:text-black transition-all clickable">
             <Download size={14} /> {isDownloading ? `EXTRACTING_DATA: ${downloadProgress}%` : "EXTRACT_SUBJECT_DATA"}
           </button>
           
           <AnimatePresence>
             {capturedData && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }} 
-                animate={{ opacity: 1, y: 0 }} 
-                exit={{ opacity: 0 }}
-                className="mt-4 text-red-500 text-[10px] font-bold tracking-widest jitter-redacted"
-              >
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mt-4 text-red-500 text-[10px] font-bold tracking-widest jitter-redacted">
                 {capturedData}
               </motion.div>
             )}
@@ -412,7 +421,6 @@ export default function AetherArchive() {
           </motion.div>
         )}
 
-        {/* SCIENTISTS' RESEARCH NOTES MODAL */}
         {isNotesOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1500] bg-black/90 flex items-center justify-center p-6" onClick={() => setIsNotesOpen(false)}>
             <div className="w-full max-w-3xl border border-white/10 bg-zinc-950 p-10 relative overflow-hidden" onClick={e => e.stopPropagation()}>
@@ -438,22 +446,18 @@ export default function AetherArchive() {
           </motion.div>
         )}
 
-        {isCorrupting && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[2000] bg-red-950/20 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-none">
-            <div className="corruption-scanner" />
-            <div className="text-red-600 font-black text-4xl animate-pulse mb-4 tracking-[1em]">CORRUPTION_IN_PROGRESS</div>
-            <div className="w-64 h-1 bg-white/10 overflow-hidden">
-              <motion.div initial={{ x: "-100%" }} animate={{ x: "100%" }} transition={{ duration: 2.5, ease: "linear" }} className="w-full h-full bg-red-600 shadow-[0_0_15px_red]" />
-            </div>
-          </motion.div>
-        )}
-
-        {/* LORE VIDEO MODAL */}
         {isScientistOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[4000] bg-black flex items-center justify-center">
              <div className="absolute top-10 left-10 text-red-600 text-[10px] tracking-[0.5em] animate-pulse">PROJECT_AETHER // ANALYSIS_LOG_04</div>
              <X className="absolute top-10 right-10 text-white/20 clickable z-[4010]" size={32} onClick={() => setIsScientistOpen(false)} />
              <video src="/lore.mp4" autoPlay playsInline className="w-full h-full object-contain" onEnded={() => setIsScientistOpen(false)} />
+          </motion.div>
+        )}
+
+        {isCorrupting && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[2000] bg-red-950/20 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-none">
+            <div className="corruption-scanner" />
+            <div className="text-red-600 font-black text-4xl animate-pulse mb-4 tracking-[1em]">CORRUPTION_IN_PROGRESS</div>
           </motion.div>
         )}
 
