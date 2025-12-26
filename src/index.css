@@ -3,53 +3,38 @@
 /** * [SOURCE_CSS_HIDDEN_MESSAGE]: 
  * The MALL is not a render. It is a coordinate.
  * Latency is the only thing keeping him inside.
+ * Extraction is impossible. He is bound to the pixel. 
  */
 
 * { cursor: none !important; }
 
 html, body {
-  margin: 0; padding: 0;
-  background-color: black;
-  color: white;
+  margin: 0; padding: 0; background-color: black; color: white;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+/* CUSTOM CURSOR */
 .custom-cursor {
-  position: fixed; top: 0; left: 0;
-  width: 40px; height: 40px;
-  pointer-events: none; z-index: 999999;
-  mix-blend-mode: difference; margin-left: -20px; margin-top: -20px;
+  position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+  pointer-events: none; z-index: 999999; mix-blend-mode: difference;
+  margin-left: -20px; margin-top: -20px;
 }
 .cursor-line-v { position: absolute; left: 50%; height: 100%; width: 1px; background: white; }
 .cursor-line-h { position: absolute; top: 50%; width: 100%; height: 1px; background: white; }
 .cursor-dot { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; background: white; border-radius: 50%; transform: translate(-50%, -50%); }
+.custom-cursor.cursor-hovering .cursor-dot { background: red; box-shadow: 0 0 15px red; transform: translate(-50%, -50%) scale(2.5); }
 
-.custom-cursor.cursor-hovering .cursor-dot {
-  background: red; box-shadow: 0 0 15px red; transform: translate(-50%, -50%) scale(2.5);
-}
-
-.wireframe-active { 
-  filter: invert(1) hue-rotate(90deg) brightness(1.5) contrast(1.2) !important; 
-}
-.wireframe-active img, .wireframe-active video { opacity: 0.1 !important; }
+/* WIREFRAME GRID */
+.wireframe-active { filter: invert(1) hue-rotate(90deg) brightness(1.5) contrast(1.2) !important; }
 .wireframe-active::after {
-  content: "";
-  position: fixed; inset: 0;
+  content: ""; position: fixed; inset: 0;
   background-image: linear-gradient(rgba(0,255,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,0,0.1) 1px, transparent 1px);
-  background-size: 80px 80px;
-  pointer-events: none; z-index: 100;
+  background-size: 80px 80px; z-index: 100; pointer-events: none;
 }
 
-.jitter-redacted { 
-  color: #ff0000 !important; 
-  text-shadow: 4px 0 #ff0000, -4px 0 #ff0000; 
-  animation: jitter 0.05s infinite;
-}
-@keyframes jitter { 
-  0% { transform: translateX(-2px) skew(2deg); } 
-  50% { transform: translateX(2px) skew(-1deg); } 
-  100% { transform: translateX(0px); } 
-}
+/* RED CORRUPTION / BREACH / JITTER */
+.jitter-redacted { color: #ff0000 !important; text-shadow: 4px 0 #ff0000, -4px 0 #ff0000; animation: jitter 0.05s infinite; }
+@keyframes jitter { 0% { transform: translateX(-2px); } 50% { transform: translateX(2px); } 100% { transform: translateX(0px); } }
 
 .data-leak-bg {
   position: fixed; inset: 0; z-index: 40; pointer-events: none;
@@ -66,17 +51,16 @@ html, body {
 @keyframes scan { from { top: 0%; } to { top: 100%; } }
 
 .breach-active { animation: breach-shake 0.1s infinite; filter: sepia(1) saturate(20) hue-rotate(-10deg) brightness(0.8); }
-@keyframes breach-shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } }
 
 .vhs-filter {
   position: fixed; inset: 0;
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
-  background-size: 100% 4px;
-  pointer-events: none; z-index: 5;
+  background-size: 100% 4px; pointer-events: none; z-index: 5;
 }
 
-.vertical-video-container { height: 92vh; aspect-ratio: 9 / 16; background: black; overflow: hidden; border: 1px solid rgba(255, 0, 0, 0.2); }
+/* UI ELEMENTS */
+.vertical-video-container { height: 92vh; aspect-ratio: 9/16; background: black; border: 1px solid rgba(255, 0, 0, 0.2); }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.animate-marquee { animation: marquee 60s linear infinite; display: flex; width: max-content; }
+.animate-marquee { animation: marquee 40s linear infinite; display: flex; width: max-content; }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 0, 0, 0.3); }
