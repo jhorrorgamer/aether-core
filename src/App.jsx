@@ -48,25 +48,25 @@ export default function AetherArchive() {
   const cursorRef = useRef(null);
   const mousePos = useRef({ x: 0, y: 0 });
 
-  // --- LORE DATABASES (Updated with Scavenger Hunt Clues) ---
+  // --- LORE DATABASES (Breadcrumbs for the Scavenger Hunt) ---
   const hints = [
     "[LOG]: 0x45 0x59 0x45 0x53",
-    "[LOG]: SEARCH_THE_'ORIGIN'_OF_THE_SYNC",
-    "[LOG]: TYPE_'LOGS'_TO_DECRYPT",
-    "[LOG]: ACCESS_THE_ARCHITECTS_INTERNAL_'MEMO'",
-    "[LOG]: INVESTIGATE_RECOVERY_FILE_003_IN_'RESEARCH'",
-    "[LOG]: RECALL_THE_FIRST_'MEMORY'"
+    "[LOG]: THE_FIRST_SYNC_IS_THE_'ORIGIN'",
+    "[LOG]: TYPE_'LOGS'_TO_DECRYPT_HISTORY",
+    "[LOG]: THE_ARCHITECT_LEFT_A_'MEMO'_IN_THE_CORE",
+    "[LOG]: 'RESEARCH'_THE_ENVELOPE_RECOVERY",
+    "[LOG]: RECALL_THE_FIRST_'MEMORY'_OF_THE_POOL"
   ];
 
   const logDatabase = [
     { type: 'error', text: "[SYSTEM]: FATAL_ERROR in Sector_7. Subject 'Dylon Martineau' has exceeded temporal bounds." },
-    { type: 'admin', user: 'ADMIN_01', text: "The first log of his entry is still in the system. Type 'OPEN ORIGIN' to see the sync start." },
+    { type: 'admin', user: 'ADMIN_01', text: "The initial sync log is still in the system. Search the 'ORIGIN' to find where we lost him." },
     { type: 'user', user: 'NULL_RECOVERY', text: "I saw Dylon in Case File 3. He looked at the camera, but his eyes... they weren't digital anymore." },
-    { type: 'admin', user: 'DEPT_CHIEF', text: "He left a final note in the sub-levels. Use 'OPEN MEMORY' to hear his last thoughts." },
-    { type: 'system', text: "[RECOVERY_FILE_003]: ENVELOPE ANALYSIS. Forensics noted linen-texture paper common in the mid-1990s. Digital watermark matches Dylon's own post-trial encryption key." },
+    { type: 'admin', user: 'DEPT_CHIEF', text: "We found an internal 'MEMO' from the Architecture Director. It explains how the anchor held." },
+    { type: 'system', text: "[RECOVERY_FILE_003]: ENVELOPE ANALYSIS. Forensics noted linen-texture paper common in the mid-1990s. Search 'RESEARCH' for the watermark report." },
     { type: 'error', text: "[INTERNAL_MONITORING_LOG]: 00:03:45 AM. Heart rate dropped to 45 BPM. Emergency extraction failed." },
-    { type: 'admin', user: 'DEPT_CHIEF', text: "[NEURAL_DOMINANCE_REPORT]: Subject 01 has achieved Core Integration. Find the 'MEMO' if you want to know how we lost him." },
-    { type: 'system', text: "[ALERT]: subject_martineau_01 status: LOST_IN_TRANSITION." }
+    { type: 'admin', user: 'DEPT_CHIEF', text: "[NEURAL_DOMINANCE_REPORT]: Subject 01 has achieved Core Integration. He is now the Architect." },
+    { type: 'system', text: "[ALERT]: Access the first 'MEMORY' to hear the silence." }
   ];
 
   const galleryImages = [
@@ -125,7 +125,7 @@ export default function AetherArchive() {
     e.preventDefault();
     const q = searchQuery.toLowerCase().trim();
     
-    // Commands to open hidden documents (User must find these keywords)
+    // Hidden triggers for the documents
     if (q === "open origin") openPublicDoc("origin");
     if (q === "open memo") openPublicDoc("memo");
     if (q === "open research") openPublicDoc("research");
@@ -134,7 +134,7 @@ export default function AetherArchive() {
     if (q === "lore") setIsLoreVideoOpen(true);
 
     if (q === "1993") {
-       alert("BORN_APRIL_19_1993: The core anchor is set.");
+       alert("BORN_APRIL_19_1993: The '93 Anchor is secured. The architect is home.");
     }
 
     if (q.includes("dylon") || q.includes("martineau")) {
@@ -206,11 +206,11 @@ export default function AetherArchive() {
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
-            <span className={isBreached ? 'text-red-500' : ''}>{isBreached ? 'SYSTEM_BREACHED' : (is404 ? 'PURGING_DATA...' : 'AETHER_CORE_STATION')}</span>
+            <span className={isBreached ? 'text-red-500' : ''}>{isBreached ? 'SYSTEM_BREACHED' : (is404 ? 'PURGING_DATA...' : 'RETRO_SLEEP_ARCHIVE')}</span>
             <div className="dead-pixel pointer-events-auto mt-4 w-1.5 h-1.5 bg-red-600 shadow-[0_0_10px_red] cursor-pointer" onClick={() => setIsSecretOpen(true)} />
             <motion.span key={currentHint} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 text-white/40 italic">{hints[currentHint]}</motion.span>
             <button onClick={() => setIsInspectOpen(true)} className="flex items-center gap-2 mt-4 text-white/10 hover:text-red-600 transition-all pointer-events-auto clickable uppercase">
-              <Eye size={12} /> Inspect_Hidden_Lore
+              <Eye size={12} /> Inspect_Lore_Fragments
             </button>
           </div>
 
@@ -234,27 +234,27 @@ export default function AetherArchive() {
       </div>
 
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
-        <h1 className={`text-[4.5rem] md:text-[10rem] font-black italic mb-2 tracking-tighter ${isBreached || isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}>
-          {is404 ? "VOID" : "AETHER_CORE"}
+        <h1 className={`text-[4.5rem] md:text-[8rem] font-black italic mb-2 tracking-tighter ${isBreached || isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}>
+          {is404 ? "VOID" : "RETRO_SLEEP"}
         </h1>
 
         <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-12 text-center max-w-2xl px-6 leading-loose">
-          A digital archive of recovered generative visuals, dreamcore aesthetics, and encrypted short-film sequences. 
-          <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
+          A digital tomb of recovered memories and neural artifacts. 
+          <br/><span className="text-white/10">[93_ANCHOR_STABILITY: 12% // DEEP_RENDER_ACTIVE]</span>
         </p>
 
         <div className="w-full max-w-2xl px-6 mb-12">
           <form onSubmit={handleNeuralSearch} className="relative group">
             <div className="relative flex items-center bg-black border border-white/10 p-4">
               <span className="text-white/20 text-[10px] mr-4 flex items-center gap-2"><ShieldAlert size={12}/> NEURAL_QUERY:</span>
-              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="SEARCH_ARCHIVE..." className="bg-transparent border-none outline-none text-[10px] text-white/60 w-full uppercase tracking-[0.3em]" />
+              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="SEARCH_DEEP_FILES..." className="bg-transparent border-none outline-none text-[10px] text-white/60 w-full uppercase tracking-[0.3em]" />
             </div>
           </form>
         </div>
 
         <div className="mb-20 flex flex-col items-center">
           <button onClick={startDownload} className="flex items-center gap-3 border border-white/20 px-8 py-2 text-[10px] tracking-[0.4em] uppercase hover:bg-white hover:text-black transition-all clickable">
-            <Download size={14} /> {isDownloading ? `EXTRACTING: ${downloadProgress}%` : "EXTRACT_SUBJECT_DATA"}
+            <Download size={14} /> {isDownloading ? `EXTRACTING: ${downloadProgress}%` : "RECOVER_SUBJECT_DATA"}
           </button>
           {capturedData && <div className="mt-4 text-red-500 text-[10px] font-bold tracking-widest jitter-redacted">{capturedData}</div>}
         </div>
@@ -279,11 +279,11 @@ export default function AetherArchive() {
         </div>
 
         <div className="w-full max-w-4xl px-6">
-           <div className="flex items-center gap-4 mb-8 text-white/20"><MessageSquare size={16} /><h2 className="text-xs uppercase tracking-[.4em]">Broadcast_Feed</h2></div>
+           <div className="flex items-center gap-4 mb-8 text-white/20"><MessageSquare size={16} /><h2 className="text-xs uppercase tracking-[.4em]">Subconscious_Broadcast</h2></div>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-1 border border-white/10 p-6 bg-white/[0.02]">
                 <form onSubmit={handleIdeaSubmit} className="flex flex-col gap-4">
-                  <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Transmit..." className="bg-black border border-white/10 p-3 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[100px] resize-none" />
+                  <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Transmit thought..." className="bg-black border border-white/10 p-3 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[100px] resize-none" />
                   <button type="submit" className="bg-white/5 border border-white/10 py-2 text-[10px] uppercase hover:bg-white hover:text-black transition-all clickable">Send</button>
                 </form>
               </div>
@@ -300,11 +300,11 @@ export default function AetherArchive() {
 
       <footer className="fixed bottom-0 w-full z-[60] py-4 bg-black border-t border-white/5 overflow-hidden">
         <div className="flex whitespace-nowrap animate-marquee text-[10px] tracking-[0.5em] uppercase text-white/10">
-          <span className="mx-20">SYSTEM_STABILITY: NOMINAL</span>
+          <span className="mx-20">PROJECT: RETRO-SLEEP</span>
           <span className="mx-20 hover:text-red-600 transition-colors clickable pointer-events-auto" onClick={() => setIsHiddenVideoOpen(true)}>
             DYLON MARTINEAU // @JHORRORGAMER
           </span>
-          <span className="mx-20">SYSTEM_STABILITY: NOMINAL</span>
+          <span className="mx-20">PROJECT: RETRO-SLEEP</span>
           <span className="mx-20 hover:text-red-600 transition-colors clickable pointer-events-auto" onClick={() => setIsHiddenVideoOpen(true)}>
             DYLON MARTINEAU // @JHORRORGAMER
           </span>
@@ -314,7 +314,6 @@ export default function AetherArchive() {
       <div ref={cursorRef} className="custom-cursor"><div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" /></div>
       
       <AnimatePresence>
-        {/* DOCUMENT VIEW MODAL */}
         {activeDoc && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1000] bg-black/98 flex items-center justify-center p-6" onClick={() => setActiveDoc(null)}>
              <div className="w-full max-w-2xl border border-white/20 bg-black p-12 relative" onClick={e => e.stopPropagation()}>
@@ -335,12 +334,13 @@ export default function AetherArchive() {
         {isInspectOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[4000] bg-black/95 flex items-center justify-center p-8" onClick={() => setIsInspectOpen(false)}>
             <div className="max-w-2xl text-center" onClick={e => e.stopPropagation()}>
-               <h3 className="text-red-600 text-xl tracking-[1em] uppercase mb-8">Unauthorized_Access_Log</h3>
+               <h3 className="text-red-600 text-xl tracking-[1em] uppercase mb-8">Unauthorized_Lore_Access</h3>
                <div className="space-y-4 text-[12px] text-white/40 text-left border border-white/10 p-8 bg-red-950/5">
-                 <p>[DECRYPTED]: Subject Dylon Martineau is a recurring artifact within the Sora latent space.</p>
-                 <p>[DECRYPTED]: To find the root sync, try to search 'OPEN ORIGIN'.</p>
-                 <p>[DECRYPTED]: Project lead's failure is documented in 'OPEN MEMO'.</p>
-                 <p>[DECRYPTED]: External evidence found in kitchen sweep: 'OPEN RESEARCH'.</p>
+                 <p>[DECRYPTED]: Subject Dylon Martineau is not lost. He has achieved Core Integration[cite: 29].</p>
+                 <p>[DECRYPTED]: The initial monitoring logs contain the 'ORIGIN' of the sync[cite: 1].</p>
+                 <p>[DECRYPTED]: Architecture Director issued a 'MEMO' regarding the reversal of control.</p>
+                 <p>[DECRYPTED]: Physical evidence recovered from residence: 'RESEARCH' the envelope[cite: 38].</p>
+                 <p>[DECRYPTED]: The first 'MEMORY' describes the pools and the silence[cite: 32].</p>
                </div>
             </div>
           </motion.div>
