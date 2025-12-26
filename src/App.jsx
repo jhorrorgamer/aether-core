@@ -27,7 +27,7 @@ export default function AetherArchive() {
     return () => clearInterval(interval);
   }, []);
 
-  // Keyboard Listener for 404 and EYES
+  // Keyboard Listener (404 and EYES)
   useEffect(() => {
     const handleKeys = (e) => {
       const char = e.key.toLowerCase();
@@ -50,7 +50,7 @@ export default function AetherArchive() {
     }
   }, [inputBuffer]);
 
-  // Centered Cursor
+  // Centered Cursor Logic
   useEffect(() => {
     const cursor = cursorRef.current;
     if (!cursor) return;
@@ -84,7 +84,7 @@ export default function AetherArchive() {
       </div>
 
       {/* CMD Console */}
-      <div className="fixed bottom-20 left-10 z-[40] w-64 p-4 border border-white/5 bg-black/40 backdrop-blur-md hidden md:block pointer-events-none">
+      <div className="fixed bottom-24 left-10 z-[40] w-64 p-4 border border-white/5 bg-black/40 backdrop-blur-md hidden md:block pointer-events-none">
         <div className="flex items-center gap-2 mb-2 text-white/40">
           <Terminal size={12} />
           <span className="text-[8px] tracking-widest uppercase">System_Log</span>
@@ -118,7 +118,7 @@ export default function AetherArchive() {
           {isEasterEgg ? "REDACTED" : "AETHER_CORE"}
         </h1>
 
-        {/* --- LINKS SECTION (RE-ADDED) --- */}
+        {/* Links */}
         <div className="flex gap-8 mb-10">
           <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest">
             <MonitorPlay size={14} /> Sora Profile
@@ -128,7 +128,7 @@ export default function AetherArchive() {
           </a>
         </div>
 
-        {/* Cryptic Hover Logic */}
+        {/* Description & Secret Text */}
         <div className="max-w-xl text-center mb-20 px-6 group hover-trigger relative">
           <p className="text-[10px] leading-relaxed text-white/30 uppercase tracking-[0.2em] italic transition-opacity group-hover:opacity-0">
             "Recovered data from a fragmented reality. This archive serves as a digital vessel for visual experiments."
@@ -157,10 +157,18 @@ export default function AetherArchive() {
         </div>
       </main>
 
+      {/* Seamless Marquee Footer */}
       <footer className="fixed bottom-0 w-full z-[60] py-3 bg-black border-t border-white/5 overflow-hidden">
         <div className={`flex whitespace-nowrap animate-marquee text-[9px] tracking-[0.4em] uppercase ${isEasterEgg ? 'text-red-600' : 'text-white/10'}`}>
-          <span className="mx-8">DYLON MARTINEAU // @JHORRORGAMER</span> • 
-          <span className="mx-8">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
+          <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
+          <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
+          <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
+          <span className="mx-12">RECOVERED_DATA_V7.02</span>
+          {/* Duplicated for Loop */}
+          <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
+          <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
+          <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
+          <span className="mx-12">RECOVERED_DATA_V7.02</span>
         </div>
       </footer>
 
