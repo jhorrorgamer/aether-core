@@ -49,7 +49,6 @@ export default function AetherArchive() {
     { type: 'user', user: 'NULL_RECOVERY', text: "I saw Dylon in Case File 3. He looked at the camera, but his eyes... they weren't digital anymore." },
     { type: 'admin', user: 'DEPT_CHIEF', text: "Stop the extraction. If we pull Dylon Martineau out now, the entire archive collapses." },
     { type: 'system', text: "[ALERT]: subject_martineau_01 status: LOST_IN_TRANSITION." },
-    { type: 'user', user: 'VOICE_09', text: "The mall isn't empty. Dylon is there. He’s been there since the first 2025 generation." },
     { type: 'error', text: "[CRITICAL]: Subject 'Dylon Martineau' found in non-indexed coordinate: NULL_SPACE." }
   ];
 
@@ -64,6 +63,7 @@ export default function AetherArchive() {
   const audioRef = useRef(null);
   const cursorRef = useRef(null);
   const mousePos = useRef({ x: 0, y: 0 });
+  const idleTimer = useRef(null);
 
   const galleryImages = [
     { src: "image1.png", meta: "SEARCH: CASE_FILE_LEVEL_188" }, 
@@ -79,15 +79,43 @@ export default function AetherArchive() {
 
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
-  // RESTORED: Console Surveillance
+  // Console Surveillance
   useEffect(() => {
     console.log("%c [SYSTEM_NOTICE]: Unauthorized Inspector Access Detected. Monitoring keystrokes... ", "color: yellow; background: black; font-weight: bold; border: 1px solid yellow; padding: 4px;");
     const devInterval = setInterval(() => {
-      const randomID = Math.random().toString(36).substring(7).toUpperCase();
-      console.log(`%c [TRACE_${randomID}]: Dylon Martineau status remains 'STATIONARY'. `, "color: #444; font-size: 9px;");
-    }, 12000);
+      console.log(`%c [TRACE]: Dylon Martineau status remains 'STATIONARY'. `, "color: #444; font-size: 9px;");
+    }, 15000);
     return () => clearInterval(devInterval);
   }, []);
+
+  // Audio & Whisper Logic
+  const playWhisper = () => {
+    if (isMuted) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(80, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 3);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 1.5);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 4);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 4);
+    } catch (e) {}
+  };
+
+  const resetIdleTimer = () => {
+    clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => {
+      if (!isMuted && !activeVideo && !isSecretOpen) {
+        playWhisper();
+        setIsGlitching(true);
+        setTimeout(() => setIsGlitching(false), 400);
+      }
+    }, 30000);
+  };
 
   const startDownload = () => {
     setIsDownloading(true);
@@ -108,17 +136,24 @@ export default function AetherArchive() {
   const handleNeuralSearch = (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-    if (searchQuery.toLowerCase().includes("dylon") || searchQuery.toLowerCase().includes("martineau")) {
+    const query = searchQuery.toLowerCase();
+    if (query.includes("dylon") || query.includes("martineau") || query.includes("subject")) {
       setIsCorrupting(true);
-      setTimeout(() => { setIsCorrupting(false); setIsBreached(true); setTimeout(() => setIsBreached(false), 5000); }, 3000);
+      setTimeout(() => {
+        setIsCorrupting(false);
+        setIsBreached(true);
+        setTimeout(() => setIsBreached(false), 5000);
+      }, 3000);
     }
     setSearchQuery("");
   };
 
   useEffect(() => {
     const fetchIdeas = async () => {
-      const { data } = await supabase.from('ideas').select('*').order('created_at', { ascending: false });
-      if (data) { setSubmittedIdeas(data); setDbStatus("online"); }
+      try {
+        const { data } = await supabase.from('ideas').select('*').order('created_at', { ascending: false });
+        if (data) { setSubmittedIdeas(data); setDbStatus("online"); }
+      } catch (err) { setDbStatus("offline"); }
     };
     fetchIdeas();
     const channel = supabase.channel('db').on('postgres_changes', { event: '*', schema: 'public', table: 'ideas' }, (p) => {
@@ -130,9 +165,15 @@ export default function AetherArchive() {
   useEffect(() => {
     const moveCursor = (e) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
+      resetIdleTimer();
       const hovered = !!e.target.closest('button, a, .clickable, input, textarea, .dead-pixel, img, video');
       if (hovered) cursorRef.current?.classList.add('cursor-hovering');
       else cursorRef.current?.classList.remove('cursor-hovering');
+      
+      if (Math.abs(e.movementX) > 130) {
+        setIsGlitching(true);
+        setTimeout(() => setIsGlitching(false), 100);
+      }
     };
     const updateCursor = () => {
       if (cursorRef.current) cursorRef.current.style.transform = `translate3d(${mousePos.current.x}px, ${mousePos.current.y}px, 0)`;
@@ -147,22 +188,28 @@ export default function AetherArchive() {
   }, []);
 
   useEffect(() => {
+    if (!audioRef.current) return;
+    (isMuted || activeVideo || is404 || isSecretOpen || isHiddenOpen) ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
+  }, [isMuted, activeVideo, is404, isSecretOpen, isHiddenOpen]);
+
+  useEffect(() => {
     const handleKeys = (e) => {
       const buffer = (inputBuffer + e.key.toLowerCase()).slice(-10);
       setInputBuffer(buffer);
       if (buffer.endsWith("eyes")) { setIsEasterEgg(true); setTimeout(() => setIsEasterEgg(false), 5000); }
       if (buffer.endsWith("breach")) { setIsBreached(true); setTimeout(() => setIsBreached(false), 8000); }
+      if (buffer.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
       if (buffer.endsWith("logs")) { setIsLogsOpen(true); }
       if (buffer.endsWith("wire")) { setIsWireframe(!isWireframe); }
-      if (buffer.endsWith("404")) { setIs404(true); setTimeout(() => setIs404(false), 3000); }
     };
     window.addEventListener("keydown", handleKeys);
     return () => window.removeEventListener("keydown", handleKeys);
   }, [inputBuffer, isWireframe]);
 
   return (
-    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isBreached ? 'breach-active' : ''} ${is404 ? 'system-wipe' : ''} ${isWireframe ? 'wireframe-active' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
+    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''} ${isBreached ? 'breach-active' : ''} ${is404 ? 'system-wipe' : ''} ${isWireframe ? 'wireframe-active' : ''}`} onClick={() => audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
+      {isDownloading && <div className="data-leak-bg" />}
       
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
@@ -175,6 +222,11 @@ export default function AetherArchive() {
           <div className="flex flex-col gap-1">
             <span className={isBreached ? 'text-red-500' : ''}>{isBreached ? 'SYSTEM_BREACHED' : 'AETHER_CORE_STATION'}</span>
             <span onMouseEnter={() => setHoverSecret("DYLON_M_NULL")} onMouseLeave={() => setHoverSecret("")} className="secret-trigger pointer-events-auto">CREATOR: DYLON MARTINEAU</span>
+            <div className="flex flex-col mt-4 gap-2 opacity-60">
+               <motion.span key={currentHint} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-white/40 italic">
+                {hints[currentHint]}
+               </motion.span>
+            </div>
             <div className="dead-pixel pointer-events-auto mt-4 w-1.5 h-1.5 bg-red-600 shadow-[0_0_10px_red]" onClick={(e) => { e.stopPropagation(); setIsSecretOpen(true); }} />
           </div>
           <button onClick={() => setIsMuted(!isMuted)} className="clickable pointer-events-auto">{isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}</button>
@@ -185,6 +237,11 @@ export default function AetherArchive() {
         <h1 className={`text-[4.5rem] md:text-[10rem] font-black italic mb-2 tracking-tighter ${isEasterEgg || isBreached ? 'jitter-redacted' : 'text-white/10'}`}>
           {is404 ? "VOID" : (isBreached ? "ACCESS_DENIED" : (isEasterEgg ? "REDACTED" : "AETHER_CORE"))}
         </h1>
+
+        <p className="text-[10px] md:text-[12px] text-white/30 uppercase tracking-[0.5em] mb-12 text-center max-w-2xl px-6 leading-loose">
+          A digital archive of recovered generative visuals, dreamcore aesthetics, and encrypted short-film sequences. 
+          <br/><span className="text-white/10">[STABILITY: 42% // SECTOR: DECEMBER_2025]</span>
+        </p>
 
         <div className="w-full max-w-2xl px-6 mb-12">
           <form onSubmit={handleNeuralSearch} className="relative group">
@@ -197,7 +254,7 @@ export default function AetherArchive() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-7xl px-8 mb-32">
           {soraVideos.map((vid, idx) => (
-            <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable shadow-2xl">
+            <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
               <video src={`/${vid}`} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-30 group-hover:opacity-100 transition-all duration-700" />
             </div>
           ))}
@@ -243,7 +300,7 @@ export default function AetherArchive() {
         )}
 
         {activeVideo && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black flex items-center justify-center p-4">
             <X className="absolute top-10 right-10 text-white/50 clickable z-[110]" size={32} onClick={() => setActiveVideo(null)} />
             <div className="vertical-video-container"><video src={`/${activeVideo}`} controls autoPlay loop playsInline className="w-full h-full object-cover" /></div>
           </motion.div>
@@ -253,6 +310,13 @@ export default function AetherArchive() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[3000] bg-black flex items-center justify-center">
              <X className="absolute top-10 right-10 text-white/20 clickable z-[3010]" size={32} onClick={() => setIsHiddenOpen(false)} />
              <video src="/hidden.mp4" autoPlay playsInline className="w-full h-full object-contain" onEnded={() => setIsHiddenOpen(false)} />
+          </motion.div>
+        )}
+
+        {isSecretOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[500] bg-black flex items-center justify-center">
+             <X className="absolute top-10 right-10 text-white/20 clickable z-[510]" size={32} onClick={() => setIsSecretOpen(false)} />
+             <video src="/secret.mp4" autoPlay playsInline className="w-full h-full object-contain" onEnded={() => setIsSecretOpen(false)} />
           </motion.div>
         )}
       </AnimatePresence>
