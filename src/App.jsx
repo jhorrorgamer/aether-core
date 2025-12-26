@@ -40,7 +40,7 @@ export default function AetherArchive() {
   const [isCorrupting, setIsCorrupting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // --- NEW: DOCUMENT VIEWER STATES ---
+  // --- DOCUMENT VIEWER STATES ---
   const [activeDoc, setActiveDoc] = useState(null);
   const [docContent, setDocContent] = useState("");
 
@@ -48,24 +48,24 @@ export default function AetherArchive() {
   const cursorRef = useRef(null);
   const mousePos = useRef({ x: 0, y: 0 });
 
-  // --- LORE DATABASES ---
+  // --- LORE DATABASES (Updated with Scavenger Hunt Clues) ---
   const hints = [
     "[LOG]: 0x45 0x59 0x45 0x53",
-    "[LOG]: SECURITY_VULNERABILITY: 'B_R_E_A_C_H'",
+    "[LOG]: SEARCH_THE_'ORIGIN'_OF_THE_SYNC",
     "[LOG]: TYPE_'LOGS'_TO_DECRYPT",
-    "[LOG]: TYPE_'WIRE'_FOR_DIAGNOSTICS",
-    "[LOG]: SEARCH_'LORE'_FOR_THE_TRUTH",
-    "[LOG]: TYPE_'404'_TO_PURGE"
+    "[LOG]: ACCESS_THE_ARCHITECTS_INTERNAL_'MEMO'",
+    "[LOG]: INVESTIGATE_RECOVERY_FILE_003_IN_'RESEARCH'",
+    "[LOG]: RECALL_THE_FIRST_'MEMORY'"
   ];
 
   const logDatabase = [
     { type: 'error', text: "[SYSTEM]: FATAL_ERROR in Sector_7. Subject 'Dylon Martineau' has exceeded temporal bounds." },
-    { type: 'admin', user: 'ADMIN_01', text: "He wasn't supposed to stay in the render. Why is the Sora engine keeping Dylon?" },
+    { type: 'admin', user: 'ADMIN_01', text: "The first log of his entry is still in the system. Type 'OPEN ORIGIN' to see the sync start." },
     { type: 'user', user: 'NULL_RECOVERY', text: "I saw Dylon in Case File 3. He looked at the camera, but his eyes... they weren't digital anymore." },
-    { type: 'admin', user: 'DEPT_CHIEF', text: "Stop the extraction. If we pull Dylon Martineau out now, the entire archive collapses." },
-    { type: 'system', text: "[RECOVERY_FILE_003]: ENVELOPE ANALYSIS. Forensics noted linen-texture paper common in the mid-1990s. Digital watermark matches Dylon's own post-trial encryption key. He sent the recruitment letter to himself." },
-    { type: 'error', text: "[INTERNAL_MONITORING_LOG]: 00:03:45 AM. Heart rate dropped to 45 BPM. Emergency extraction failed. Terminal returned: 'User Has Found It.'" },
-    { type: 'admin', user: 'DEPT_CHIEF', text: "[NEURAL_DOMINANCE_REPORT]: Subject 01 has achieved Core Integration. He is no longer the research subject. He is the Architect. Sora control lost." },
+    { type: 'admin', user: 'DEPT_CHIEF', text: "He left a final note in the sub-levels. Use 'OPEN MEMORY' to hear his last thoughts." },
+    { type: 'system', text: "[RECOVERY_FILE_003]: ENVELOPE ANALYSIS. Forensics noted linen-texture paper common in the mid-1990s. Digital watermark matches Dylon's own post-trial encryption key." },
+    { type: 'error', text: "[INTERNAL_MONITORING_LOG]: 00:03:45 AM. Heart rate dropped to 45 BPM. Emergency extraction failed." },
+    { type: 'admin', user: 'DEPT_CHIEF', text: "[NEURAL_DOMINANCE_REPORT]: Subject 01 has achieved Core Integration. Find the 'MEMO' if you want to know how we lost him." },
     { type: 'system', text: "[ALERT]: subject_martineau_01 status: LOST_IN_TRANSITION." }
   ];
 
@@ -77,7 +77,7 @@ export default function AetherArchive() {
     { src: "image9.png", meta: "CASE_FILE_NULL_SPACE" }
   ];
 
-  // --- NEW: FETCHING LOGIC FOR HIDDEN DOCUMENTS ---
+  // --- FETCHING LOGIC FOR HIDDEN DOCUMENTS ---
   const openPublicDoc = async (fileName) => {
     try {
       const response = await fetch(`/docs/${fileName}.txt`);
@@ -121,12 +121,11 @@ export default function AetherArchive() {
     setUserIdea("");
   };
 
-  // --- NEURAL SEARCH (UPDATED WITH DOCUMENT TRIGGERS) ---
   const handleNeuralSearch = (e) => {
     e.preventDefault();
     const q = searchQuery.toLowerCase().trim();
     
-    // Commands to open recovered documents
+    // Commands to open hidden documents (User must find these keywords)
     if (q === "open origin") openPublicDoc("origin");
     if (q === "open memo") openPublicDoc("memo");
     if (q === "open research") openPublicDoc("research");
@@ -135,7 +134,7 @@ export default function AetherArchive() {
     if (q === "lore") setIsLoreVideoOpen(true);
 
     if (q === "1993") {
-       alert("BORN_APRIL_19_1993: Time machine initialized. The Void is safer than the Noise.");
+       alert("BORN_APRIL_19_1993: The core anchor is set.");
     }
 
     if (q.includes("dylon") || q.includes("martineau")) {
@@ -251,10 +250,6 @@ export default function AetherArchive() {
               <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="SEARCH_ARCHIVE..." className="bg-transparent border-none outline-none text-[10px] text-white/60 w-full uppercase tracking-[0.3em]" />
             </div>
           </form>
-          {/* USER HINT FOR NEW DOCUMENTS */}
-          <div className="mt-2 text-[8px] text-white/10 tracking-widest uppercase flex gap-4 justify-center">
-             <span>Try: 'open origin'</span> <span>'open memo'</span> <span>'open research'</span> <span>'open memory'</span>
-          </div>
         </div>
 
         <div className="mb-20 flex flex-col items-center">
@@ -319,7 +314,7 @@ export default function AetherArchive() {
       <div ref={cursorRef} className="custom-cursor"><div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" /></div>
       
       <AnimatePresence>
-        {/* NEW: DOCUMENT VIEW MODAL */}
+        {/* DOCUMENT VIEW MODAL */}
         {activeDoc && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1000] bg-black/98 flex items-center justify-center p-6" onClick={() => setActiveDoc(null)}>
              <div className="w-full max-w-2xl border border-white/20 bg-black p-12 relative" onClick={e => e.stopPropagation()}>
@@ -343,8 +338,9 @@ export default function AetherArchive() {
                <h3 className="text-red-600 text-xl tracking-[1em] uppercase mb-8">Unauthorized_Access_Log</h3>
                <div className="space-y-4 text-[12px] text-white/40 text-left border border-white/10 p-8 bg-red-950/5">
                  <p>[DECRYPTED]: Subject Dylon Martineau is a recurring artifact within the Sora latent space.</p>
-                 <p>[DECRYPTED]: The mall videos are not just renders. They are memories stored in the machine.</p>
-                 <p>[DECRYPTED]: Born April 19, 1993. The recruitment letter was an invitation back to his own childhood.</p>
+                 <p>[DECRYPTED]: To find the root sync, try to search 'OPEN ORIGIN'.</p>
+                 <p>[DECRYPTED]: Project lead's failure is documented in 'OPEN MEMO'.</p>
+                 <p>[DECRYPTED]: External evidence found in kitchen sweep: 'OPEN RESEARCH'.</p>
                </div>
             </div>
           </motion.div>
