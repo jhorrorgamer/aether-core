@@ -3,13 +3,11 @@ import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { X, Youtube, MonitorPlay, Volume2, VolumeX, Terminal, Database, MessageSquare, Send, Trash2 } from "lucide-react";
 
-// --- CONNECTION ---
 const supabaseUrl = 'https://mrjrampvdwmppmyyoxqs.supabase.co';
 const supabaseKey = 'sb_publishable_EPAWiAKKO-rKEPSWjZKmAQ_ErKQ5qFd';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function AetherArchive() {
-  // --- STATES ---
   const [selectedImg, setSelectedImg] = useState(null);
   const [isEasterEgg, setIsEasterEgg] = useState(false);
   const [isGlitching, setIsGlitching] = useState(false);
@@ -21,29 +19,19 @@ export default function AetherArchive() {
   const [userIdea, setUserIdea] = useState("");
   const [submittedIdeas, setSubmittedIdeas] = useState([]);
   const [dbStatus, setDbStatus] = useState("connecting");
+  const [terminalLogs] = useState(["[SYS]: VECTORS_STABLE", "[MEM]: RECOVERY_COMPLETE", "[NET]: LINK_ESTABLISHED"]);
 
   const audioRef = useRef(null);
   const cursorRef = useRef(null);
 
-  // --- CONTENT ---
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
   const transmissions = [
-    { 
-      id: "01", 
-      title: "THE_VOID_PROTOCOL", 
-      body: "Initial testing of Sora generative vectors. Reality stability at 42%.", 
-      secret: "IT_KNOWS_YOU_ARE_WATCHING" 
-    },
-    { 
-      id: "02", 
-      title: "DREAM_LOG_SEQUENCE", 
-      body: "Visual sequences recovered from the December 2025 batch. High grain detected.", 
-      secret: "DO_NOT_DISTURB_THE_SLEEPER" 
-    }
+    { id: "01", title: "THE_VOID_PROTOCOL", body: "Initial testing of Sora generative vectors. Reality stability at 42%. Data suggests the environment is self-aware.", secret: "IT_KNOWS_YOU_ARE_WATCHING" },
+    { id: "02", title: "DREAM_LOG_SEQUENCE", body: "Visual sequences recovered from the December 2025 batch. High grain detected. The subject refused to wake up.", secret: "DO_NOT_DISTURB_THE_SLEEPER" }
   ];
 
-  // --- DATABASE LOGIC ---
+  // Database Logic
   useEffect(() => {
     const fetchIdeas = async () => {
       try {
@@ -68,6 +56,16 @@ export default function AetherArchive() {
     return () => supabase.removeChannel(channel);
   }, []);
 
+  // FIXED: Audio Logic - Mute button and Video detection
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if (isMuted || activeVideo || isSecretOpen) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(() => {});
+    }
+  }, [isMuted, activeVideo, isSecretOpen]);
+
   const handleIdeaSubmit = async (e) => {
     e.preventDefault();
     if (!userIdea.trim() || dbStatus !== "online") return;
@@ -75,15 +73,10 @@ export default function AetherArchive() {
     setUserIdea("");
   };
 
-  // Moderator Delete: Hold Alt Key + Click the message
   const handleDelete = async (id, e) => {
-    if (e.altKey) {
-      const { error } = await supabase.from('ideas').delete().eq('id', id);
-      if (error) console.error("Purge failed:", error);
-    }
+    if (e.altKey) await supabase.from('ideas').delete().eq('id', id);
   };
 
-  // --- INTERACTIVITY ---
   useEffect(() => {
     const handleKeys = (e) => setInputBuffer(prev => (prev + e.key.toLowerCase()).slice(-10));
     window.addEventListener("keydown", handleKeys);
@@ -108,26 +101,29 @@ export default function AetherArchive() {
   }, []);
 
   return (
-    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''}`} onClick={() => audioRef.current?.play()}>
+    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''}`} onClick={() => !isMuted && !activeVideo && audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
       
-      {/* ATMOSPHERIC OVERLAYS */}
+      {/* BACKGROUND */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className={`absolute inset-0 bg-[url('/dreamcore.jpg')] bg-cover bg-center transition-opacity duration-1000 ${isEasterEgg ? 'opacity-0' : 'opacity-20'}`} />
         <div className={`absolute inset-0 bg-[url('/eyes.png')] bg-cover bg-center transition-opacity duration-75 ${isEasterEgg ? 'opacity-100' : 'opacity-0'}`} />
         <div className="vhs-filter" />
       </div>
 
-      {/* HEADER HUD */}
+      {/* HUD & TERMINAL LOGS */}
       <div className="fixed inset-0 pointer-events-none z-50 p-8 text-white/20 text-[10px] uppercase tracking-[0.2em]">
         <div className="flex justify-between items-start">
           <div className="flex flex-col gap-1">
             <span>STATION: AETHER_CORE</span>
             <span onMouseEnter={() => setHoverSecret("WHO_IS_DYLON?")} onMouseLeave={() => setHoverSecret("")} className="secret-trigger pointer-events-auto">CREATOR: DYLON MARTINEAU</span>
+            <div className="flex flex-col mt-4 gap-1 opacity-50">
+              {terminalLogs.map((log, i) => <span key={i}>{log}</span>)}
+            </div>
             <div className="dead-pixel pointer-events-auto mt-4 w-2 h-2 bg-red-600 shadow-[0_0_10px_red]" onClick={(e) => { e.stopPropagation(); setIsSecretOpen(true); }} />
           </div>
           <button onClick={() => setIsMuted(!isMuted)} className="clickable pointer-events-auto transition-colors hover:text-white">
-            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            {isMuted ? <VolumeX size={24} /> : <Volume2 size={24} />}
           </button>
         </div>
         <AnimatePresence>
@@ -159,11 +155,11 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* 2. RECOVERED TRANSMISSIONS */}
+        {/* 2. RECOVERED DATA WITH DESCRIPTIONS */}
         <div className="w-full max-w-4xl px-6 mb-32">
            <div className="flex items-center gap-4 mb-8 text-white/20">
               <Database size={16} />
-              <h2 className="text-xs uppercase tracking-[.4em]">Recovered_Data</h2>
+              <h2 className="text-xs uppercase tracking-[.4em]">Recovered_Transmissions</h2>
            </div>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {transmissions.map((log) => (
@@ -200,7 +196,7 @@ export default function AetherArchive() {
                   <textarea value={userIdea} onChange={(e) => setUserIdea(e.target.value)} placeholder="Submit data..." className="bg-black border border-white/10 p-3 text-[10px] text-white focus:outline-none focus:border-red-600/50 min-h-[120px] resize-none font-mono" />
                   <button type="submit" className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 py-2 text-[10px] uppercase hover:bg-white hover:text-black transition-all clickable"><Send size={12} /> Broadcast</button>
                 </form>
-                <p className="text-[7px] text-white/10 mt-4 italic uppercase tracking-widest">Hold Alt + Click to delete any entry.</p>
+                <p className="text-[7px] text-white/10 mt-4 italic uppercase tracking-widest">Admin: Alt + Click to delete.</p>
               </div>
               <div className="md:col-span-2 flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar">
                 {submittedIdeas.map((idea) => (
@@ -223,19 +219,14 @@ export default function AetherArchive() {
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
           <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
-          <span className="mx-12">RECOVERED_DATA_V7.02</span>
-          {/* Loop duplicate */}
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
           <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
-          <span className="mx-12">RECOVERED_DATA_V7.02</span>
         </div>
       </footer>
 
-      {/* CURSOR */}
       <div ref={cursorRef} className="custom-cursor"><div className="cursor-line-v" /><div className="cursor-line-h" /><div className="cursor-dot" /></div>
 
-      {/* MODALS */}
       <AnimatePresence>
         {activeVideo && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
@@ -245,7 +236,7 @@ export default function AetherArchive() {
         )}
         {selectedImg && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-10" onClick={() => setSelectedImg(null)}>
-            <img src={`/${selectedImg}`} className="max-w-full max-h-full border border-white/10 shadow-2xl" />
+            <img src={`/${selectedImg}`} className="max-w-full max-h-full border border-white/10" />
           </motion.div>
         )}
         {isSecretOpen && (
