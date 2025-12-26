@@ -17,6 +17,7 @@ export default function AetherArchive() {
   const [randomLogs, setRandomLogs] = useState([]);
   const [inputBuffer, setInputBuffer] = useState("");
   const [isSecretOpen, setIsSecretOpen] = useState(false);
+  const [isHiddenOpen, setIsHiddenOpen] = useState(false); // NEW: State for hidden.mp4
   const [activeVideo, setActiveVideo] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [hoverSecret, setHoverSecret] = useState("");
@@ -25,7 +26,6 @@ export default function AetherArchive() {
   const [dbStatus, setDbStatus] = useState("connecting");
   const [currentHint, setCurrentHint] = useState(0);
 
-  // NEW STATES FOR LORE EXPANSION
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [capturedData, setCapturedData] = useState(null);
@@ -99,7 +99,7 @@ export default function AetherArchive() {
   const resetIdleTimer = () => {
     clearTimeout(idleTimer.current);
     idleTimer.current = setTimeout(() => {
-      if (!isMuted && !activeVideo && !isSecretOpen) {
+      if (!isMuted && !activeVideo && !isSecretOpen && !isHiddenOpen) {
         playWhisper();
         setIsGlitching(true);
         setTimeout(() => setIsGlitching(false), 400);
@@ -198,8 +198,8 @@ export default function AetherArchive() {
 
   useEffect(() => {
     if (!audioRef.current) return;
-    (isMuted || activeVideo || is404 || isSecretOpen) ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
-  }, [isMuted, activeVideo, is404, isSecretOpen]);
+    (isMuted || activeVideo || is404 || isSecretOpen || isHiddenOpen) ? audioRef.current.pause() : audioRef.current.play().catch(() => {});
+  }, [isMuted, activeVideo, is404, isSecretOpen, isHiddenOpen]);
 
   const handleIdeaSubmit = async (e) => {
     e.preventDefault();
@@ -370,10 +370,20 @@ export default function AetherArchive() {
         <div className="flex whitespace-nowrap animate-marquee text-[9px] tracking-[0.4em] uppercase text-white/10">
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
-          <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
+          <span 
+            className="mx-12 clickable hover:text-white transition-colors"
+            onClick={() => setIsHiddenOpen(true)}
+          >
+            DYLON MARTINEAU // @JHORRORGAMER
+          </span>
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
-          <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
+          <span 
+            className="mx-12 clickable hover:text-white transition-colors"
+            onClick={() => setIsHiddenOpen(true)}
+          >
+            DYLON MARTINEAU // @JHORRORGAMER
+          </span>
         </div>
       </footer>
 
@@ -434,6 +444,15 @@ export default function AetherArchive() {
             <div className="vertical-video-container border border-white/10"><video src={`/${activeVideo}`} controls autoPlay loop playsInline className="w-full h-full object-cover" /></div>
           </motion.div>
         )}
+
+        {/* HIDDEN BACKDOOR MODAL */}
+        {isHiddenOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[3000] bg-black flex items-center justify-center">
+             <X className="absolute top-10 right-10 text-white/20 clickable z-[3010]" size={32} onClick={() => setIsHiddenOpen(false)} />
+             <video src="/hidden.mp4" autoPlay playsInline className="w-full h-full object-contain" onEnded={() => setIsHiddenOpen(false)} />
+          </motion.div>
+        )}
+
         {selectedImg && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-10" onClick={() => setSelectedImg(null)}>
             <img src={`/${selectedImg}`} className="max-w-full max-h-full border border-white/10" />
