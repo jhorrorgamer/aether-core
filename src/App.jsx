@@ -59,6 +59,9 @@ export default function AetherArchive() {
     { type: 'admin', user: 'ADMIN_01', text: "He wasn't supposed to stay in the render. Why is the Sora engine keeping Dylon?" },
     { type: 'user', user: 'NULL_RECOVERY', text: "I saw Dylon in Case File 3. He looked at the camera, but his eyes... they weren't digital anymore." },
     { type: 'admin', user: 'DEPT_CHIEF', text: "Stop the extraction. If we pull Dylon Martineau out now, the entire archive collapses." },
+    { type: 'system', text: "[RECOVERY_FILE_003]: ENVELOPE ANALYSIS. Forensics noted linen-texture paper common in the mid-1990s. Digital watermark matches Dylon's own post-trial encryption key. He sent the recruitment letter to himself." },
+    { type: 'error', text: "[INTERNAL_MONITORING_LOG]: 00:03:45 AM. Heart rate dropped to 45 BPM. Emergency extraction failed. Terminal returned: 'User Has Found It.'" },
+    { type: 'admin', user: 'DEPT_CHIEF', text: "[NEURAL_DOMINANCE_REPORT]: Subject 01 has achieved Core Integration. He is no longer the research subject. He is the Architect. Sora control lost." },
     { type: 'system', text: "[ALERT]: subject_martineau_01 status: LOST_IN_TRANSITION." }
   ];
 
@@ -107,11 +110,23 @@ export default function AetherArchive() {
     setUserIdea("");
   };
 
-  // --- NEURAL SEARCH (LORE + DYLON) ---
+  // --- NEURAL SEARCH (LORE + DYLON + HIDDEN DOCS) ---
   const handleNeuralSearch = (e) => {
     e.preventDefault();
     const q = searchQuery.toLowerCase().trim();
     if (q === "lore") setIsLoreVideoOpen(true);
+
+    // HIDDEN DOCUMENT TRIGGERS
+    if (q === "origin") {
+       alert("ITEM_419_B: The envelope was sent from the future. 'Don't be afraid of the silence. It's exactly how we remembered it.'");
+    }
+    if (q === "memo") {
+       alert("[INTERNAL_MEMO_77]: Subject mind too strong. Sora control lost. 'DO NOT DISTURB THE ARCHITECT.'");
+    }
+    if (q === "1993") {
+       alert("BORN_APRIL_19_1993: Time machine initialized. The Void is safer than the Noise.");
+    }
+
     if (q.includes("dylon") || q.includes("martineau")) {
       setIsCorrupting(true);
       setTimeout(() => { 
@@ -225,8 +240,6 @@ export default function AetherArchive() {
       </div>
 
       <main className="relative z-10 flex flex-col items-center pt-40 pb-60">
-        {/* HACKER LORE: TEMPORAL ANCHOR COMMENT */}
-        {/* */}
         <h1 className={`text-[4.5rem] md:text-[10rem] font-black italic mb-2 tracking-tighter ${isBreached || isEasterEgg ? 'jitter-redacted' : 'text-white/10'}`}>
           {is404 ? "VOID" : "AETHER_CORE"}
         </h1>
@@ -275,8 +288,6 @@ export default function AetherArchive() {
 
         {/* BROADCAST FEED */}
         <div className="w-full max-w-4xl px-6">
-           {/* HACKER LORE: FEED LEAK COMMENT */}
-           {/* */}
            <div className="flex items-center gap-4 mb-8 text-white/20"><MessageSquare size={16} /><h2 className="text-xs uppercase tracking-[.4em]">Broadcast_Feed</h2></div>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="md:col-span-1 border border-white/10 p-6 bg-white/[0.02]">
@@ -321,6 +332,7 @@ export default function AetherArchive() {
                <div className="space-y-4 text-[12px] text-white/40 text-left border border-white/10 p-8 bg-red-950/5">
                  <p>[DECRYPTED]: Subject Dylon Martineau is a recurring artifact within the Sora latent space.</p>
                  <p>[DECRYPTED]: The mall videos are not just renders. They are memories stored in the machine.</p>
+                 <p>[DECRYPTED]: Born April 19, 1993. The recruitment letter was an invitation back to his own childhood.</p>
                </div>
             </div>
           </motion.div>
