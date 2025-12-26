@@ -18,6 +18,17 @@ export default function AetherArchive() {
   const galleryImages = ["image1.png", "image2.png", "image3.png", "image4.png", "image5.png", "image6.png", "image7.png", "image8.png", "image9.png"];
   const soraVideos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4", "video6.mp4"];
 
+  // Logic to pause background music when a video is active
+  useEffect(() => {
+    if (audioRef.current) {
+      if (activeVideo || isSecretOpen) {
+        audioRef.current.pause();
+      } else if (!isMuted) {
+        audioRef.current.play().catch(() => {});
+      }
+    }
+  }, [activeVideo, isSecretOpen, isMuted]);
+
   // CMD Console Logic
   useEffect(() => {
     const messages = ["[WARN]: DATA_LEAK", "[INFO]: SCANNING_VOID...", "[SYSTEM]: ENTITY_DETECTED", "[LOG]: MEMORY_404", "[VOID]: IT_WATCHES"];
@@ -27,7 +38,7 @@ export default function AetherArchive() {
     return () => clearInterval(interval);
   }, []);
 
-  // Keyboard Listener (404 and EYES)
+  // Keyboard Listener
   useEffect(() => {
     const handleKeys = (e) => {
       const char = e.key.toLowerCase();
@@ -69,11 +80,10 @@ export default function AetherArchive() {
   const toggleMute = (e) => {
     e.stopPropagation();
     setIsMuted(!isMuted);
-    if (audioRef.current) audioRef.current.muted = !isMuted;
   };
 
   return (
-    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''}`} onClick={() => audioRef.current?.play()}>
+    <div className={`relative min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isGlitching ? 'screen-shake' : ''}`} onClick={() => !activeVideo && audioRef.current?.play()}>
       <audio ref={audioRef} src="/music.mp3" loop />
 
       {/* Background Layers */}
@@ -118,7 +128,6 @@ export default function AetherArchive() {
           {isEasterEgg ? "REDACTED" : "AETHER_CORE"}
         </h1>
 
-        {/* Links */}
         <div className="flex gap-8 mb-10">
           <a href="https://sora.chatgpt.com/profile/jhorrorgamer" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[10px] text-white/30 hover:text-white clickable uppercase tracking-widest">
             <MonitorPlay size={14} /> Sora Profile
@@ -128,7 +137,6 @@ export default function AetherArchive() {
           </a>
         </div>
 
-        {/* Description & Secret Text */}
         <div className="max-w-xl text-center mb-20 px-6 group hover-trigger relative">
           <p className="text-[10px] leading-relaxed text-white/30 uppercase tracking-[0.2em] italic transition-opacity group-hover:opacity-0">
             "Recovered data from a fragmented reality. This archive serves as a digital vessel for visual experiments."
@@ -138,7 +146,6 @@ export default function AetherArchive() {
           </p>
         </div>
 
-        {/* Video Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl px-6 mb-20">
           {soraVideos.map((vid, idx) => (
             <div key={idx} onClick={() => setActiveVideo(vid)} className="aspect-video bg-white/5 border border-white/10 group overflow-hidden clickable">
@@ -147,7 +154,6 @@ export default function AetherArchive() {
           ))}
         </div>
 
-        {/* Image Grid */}
         <div className="grid grid-cols-3 gap-2 w-full max-w-6xl px-6">
           {galleryImages.map((img, i) => (
             <div key={i} className="aspect-square bg-white/5 border border-white/5 overflow-hidden group clickable" onClick={() => setSelectedImg(img)}>
@@ -164,7 +170,7 @@ export default function AetherArchive() {
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
           <span className="mx-12">RECOVERED_DATA_V7.02</span>
-          {/* Duplicated for Loop */}
+          {/* Mirror for Seamless Loop */}
           <span className="mx-12">DYLON MARTINEAU // @JHORRORGAMER</span>
           <span className="mx-12">SYSTEM_STABILITY: {isGlitching ? "ERROR" : "NOMINAL"}</span>
           <span className="mx-12">AETHER_ARCHIVE_2025 // TRANSMISSION_STABLE</span>
