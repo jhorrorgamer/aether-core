@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { X, Terminal, ShieldAlert, Download, Eye, Volume2, VolumeX, MessageSquare, FileText } from "lucide-react";
+import { X, Terminal, ShieldAlert, Download, Eye, Volume2, VolumeX, MessageSquare, FileText, MonitorOff } from "lucide-react";
 
 /**
  * [SOURCE_CODE_HIDDEN_MESSAGE]: 
@@ -39,6 +39,7 @@ export default function AetherArchive() {
   const [capturedData, setCapturedData] = useState(null);
   const [isCorrupting, setIsCorrupting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
 
   // --- DOCUMENT VIEWER STATES ---
   const [activeDoc, setActiveDoc] = useState(null);
@@ -76,6 +77,16 @@ export default function AetherArchive() {
     { src: "image7.png", meta: "CASE_FILE_ECHO_HALL" }, { src: "image8.png", meta: "CASE_FILE_STATIC_TV" },
     { src: "image9.png", meta: "CASE_FILE_NULL_SPACE" }
   ];
+
+  // --- DEVICE CHECK ---
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
+  }, []);
 
   // --- FETCHING LOGIC FOR HIDDEN DOCUMENTS ---
   const openPublicDoc = async (fileName) => {
@@ -191,6 +202,27 @@ export default function AetherArchive() {
     requestAnimationFrame(frame);
     return () => window.removeEventListener("mousemove", move);
   }, []);
+
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-12 font-mono text-red-600 text-center z-[999999] overflow-hidden">
+        <div className="vhs-filter opacity-50" />
+        <MonitorOff size={48} className="mb-8 animate-pulse" />
+        <h2 className="text-xl font-black tracking-[0.3em] mb-4 uppercase">Access_Denied</h2>
+        <div className="w-full max-w-xs h-px bg-red-900/50 mb-6" />
+        <p className="text-[10px] leading-loose tracking-widest uppercase opacity-70">
+          Neural-Sync Protocol 00:03:45 requires high-bandwidth workstation architecture.
+          <br /><br />
+          Handheld units lack sufficient VRAM to render the Sora Latent Space.
+          <br /><br />
+          <span className="text-white/40">Please log in via Stationary Terminal.</span>
+        </p>
+        <div className="mt-12 text-[8px] opacity-20 uppercase animate-marquee w-full">
+          Subject_01_Martineau_Subject_01_Martineau_Subject_01_Martineau
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isBreached ? 'breach-active' : ''} ${isWireframe ? 'wireframe-active' : ''} ${is404 ? 'system-wipe' : ''}`}>
@@ -336,11 +368,11 @@ export default function AetherArchive() {
             <div className="max-w-2xl text-center" onClick={e => e.stopPropagation()}>
                <h3 className="text-red-600 text-xl tracking-[1em] uppercase mb-8">Unauthorized_Lore_Access</h3>
                <div className="space-y-4 text-[12px] text-white/40 text-left border border-white/10 p-8 bg-red-950/5">
-                 <p>[DECRYPTED]: Subject Dylon Martineau is not lost. He has achieved Core Integration[cite: 29].</p>
-                 <p>[DECRYPTED]: The initial monitoring logs contain the 'ORIGIN' of the sync[cite: 1].</p>
+                 <p>[DECRYPTED]: Subject Dylon Martineau is not lost. He has achieved Core Integration.</p>
+                 <p>[DECRYPTED]: The initial monitoring logs contain the 'ORIGIN' of the sync.</p>
                  <p>[DECRYPTED]: Architecture Director issued a 'MEMO' regarding the reversal of control.</p>
-                 <p>[DECRYPTED]: Physical evidence recovered from residence: 'RESEARCH' the envelope[cite: 38].</p>
-                 <p>[DECRYPTED]: The first 'MEMORY' describes the pools and the silence[cite: 32].</p>
+                 <p>[DECRYPTED]: Physical evidence recovered from residence: 'RESEARCH' the envelope.</p>
+                 <p>[DECRYPTED]: The first 'MEMORY' describes the pools and the silence.</p>
                </div>
             </div>
           </motion.div>
