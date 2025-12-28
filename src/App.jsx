@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { X, Terminal, ShieldAlert, Download, Eye, Volume2, VolumeX, MessageSquare, FileText, MonitorOff } from "lucide-react";
+import { Analytics } from "@vercel/analytics/react";
 
 /**
  * [SOURCE_CODE_HIDDEN_MESSAGE]: 
@@ -227,6 +228,7 @@ export default function AetherArchive() {
   return (
     <div className={`min-h-screen w-full bg-black font-mono text-white overflow-x-hidden ${isBreached ? 'breach-active' : ''} ${isWireframe ? 'wireframe-active' : ''} ${is404 ? 'system-wipe' : ''}`}>
       <audio ref={audioRef} src="/music.mp3" loop />
+      <Analytics />
       {isDownloading && <div className="data-leak-bg" />}
       
       <div className="fixed inset-0 z-0 pointer-events-none">
