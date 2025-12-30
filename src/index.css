@@ -1,12 +1,11 @@
+@import "tailwindcss";
+
 /*
   .-----------------------------------------------------------.
-  |  [!] UNAUTHORIZED SOURCE ACCESS DETECTED                  |
+  |  [!] MONOCHROME SYSTEM ACCESS DETECTED                    |
   |  ARCHIVE_TYPE: SORA_LATENT_SPACE_RECOVERY                 |
-  |  CORE_ENGINE: D_MARTINEAU_01                              |
   '-----------------------------------------------------------'
 */
-
-@import "tailwindcss";
 
 * { cursor: none !important; }
 
@@ -27,71 +26,68 @@ html, body {
 .custom-cursor.cursor-hovering .cursor-dot { background: red; box-shadow: 0 0 15px red; transform: translate(-50%, -50%) scale(2.5); }
 
 /* --- WIREFRAME GRID --- */
-.wireframe-active { filter: invert(1) hue-rotate(90deg) brightness(1.5) contrast(1.2) !important; }
+.wireframe-active { filter: invert(1) grayscale(1) brightness(1.2) contrast(1.2) !important; }
 .wireframe-active::after {
   content: ""; position: fixed; inset: 0;
-  background-image: linear-gradient(rgba(0,255,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,0,0.1) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
   background-size: 80px 80px; z-index: 100; pointer-events: none;
 }
 
-/* --- ANIMATIONS: JITTER, SCAN, SHAKE --- */
-.jitter-redacted { color: #ff0000 !important; text-shadow: 4px 0 #ff0000, -4px 0 #ff0000; animation: jitter 0.05s infinite; }
+/* --- ANIMATIONS --- */
+.jitter-redacted { color: #ffffff !important; text-shadow: 4px 0 #333, -4px 0 #333; animation: jitter 0.05s infinite; }
 @keyframes jitter { 
-  0% { transform: translate(-2px, 1px); } 
-  25% { transform: translate(2px, -1px); }
-  50% { transform: translate(-1px, 2px); }
-  75% { transform: translate(1px, -2px); }
+  0% { transform: translate(-1px, 1px); } 
+  50% { transform: translate(1px, -1px); }
   100% { transform: translate(0px, 0px); } 
 }
 
 .corruption-scanner {
-  position: absolute; top: 0; left: 0; width: 100%; height: 6px;
-  background: rgba(255, 0, 0, 0.9); box-shadow: 0 0 30px #ff0000;
+  position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+  background: white; box-shadow: 0 0 20px white;
   animation: scan 1.2s linear infinite;
 }
 @keyframes scan { from { top: 0%; } to { top: 100%; } }
 
 .breach-active { 
   animation: breach-shake 0.1s infinite; 
-  filter: sepia(1) saturate(20) hue-rotate(-10deg) brightness(0.8); 
+  filter: grayscale(1) invert(1) brightness(0.7); 
 }
 @keyframes breach-shake {
-  0% { transform: translate(1px, 1px) rotate(0deg); }
-  20% { transform: translate(-2px, 0px) rotate(-1deg); }
-  40% { transform: translate(-1px, -1px) rotate(1deg); }
-  60% { transform: translate(2px, 1px) rotate(0deg); }
-  80% { transform: translate(-1px, 1px) rotate(-1deg); }
-  100% { transform: translate(1px, -1px) rotate(1deg); }
+  0% { transform: translate(1px, 1px); }
+  100% { transform: translate(-1px, -1px); }
 }
 
 .system-wipe { filter: brightness(0) invert(1) !important; background-color: white !important; transition: all 0.2s ease-in; }
 
-/* --- TERMINAL OVERLAY --- */
-.crt-overlay {
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  background-size: 100% 3px, 3px 100%; pointer-events: none; box-shadow: inset 0 0 150px rgba(0,0,0,0.8);
+/* --- TERMINAL REFINEMENT --- */
+.terminal-scanline {
+  position: absolute; inset: 0; width: 100%; height: 100px; z-index: 10;
+  background: linear-gradient(0deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+  animation: terminal-scan 4s linear infinite; pointer-events: none;
 }
-.glow-text { text-shadow: 0 0 8px rgba(0, 255, 0, 0.6); }
-.terminal-container { animation: terminal-flicker 0.15s infinite; }
-@keyframes terminal-flicker { 0% { opacity: 0.99; } 100% { opacity: 1; } }
+@keyframes terminal-scan { 0% { top: -100px; } 100% { top: 100%; } }
+
+.terminal-flicker { animation: term-flicker 0.15s infinite; }
+@keyframes term-flicker { 0% { opacity: 0.98; } 100% { opacity: 1; } }
 
 /* --- DATA LEAK & VHS --- */
 .data-leak-bg {
   position: fixed; inset: 0; z-index: 40; pointer-events: none;
   animation: slide-up 8s linear infinite;
-  background: repeating-linear-gradient(0deg, rgba(255,0,0,0.08) 0px, rgba(255,0,0,0.08) 2px, transparent 2px, transparent 4px);
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 3px);
 }
 @keyframes slide-up { from { background-position: 0 0; } to { background-position: 0 -100px; } }
 
 .vhs-filter {
   position: fixed; inset: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
   background-size: 100% 4px; pointer-events: none; z-index: 5;
 }
 
 /* --- UI UTILS --- */
-.vertical-video-container { height: 92vh; aspect-ratio: 9/16; background: black; border: 1px solid rgba(255, 0, 0, 0.2); }
+.vertical-video-container { height: 92vh; aspect-ratio: 9/16; background: black; border: 1px solid rgba(255, 255, 255, 0.1); }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .animate-marquee { animation: marquee 40s linear infinite; display: flex; width: max-content; }
-.custom-scrollbar::-webkit-scrollbar { width: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 0, 0, 0.3); }
+
+.custom-scrollbar::-webkit-scrollbar { width: 2px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: white; }

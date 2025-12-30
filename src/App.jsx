@@ -204,10 +204,7 @@ export default function AetherArchive() {
       const newBuffer = (inputBuffer + e.key.toLowerCase()).slice(-10);
       setInputBuffer(newBuffer);
       
-      // Hidden Terminal Trigger
       if (newBuffer.endsWith("terminal")) setIsTerminalActive(true);
-      
-      // Original Triggers
       if (newBuffer.endsWith("eyes")) {
         setIsEasterEgg(true);
         setTimeout(() => setIsEasterEgg(false), 5000);
@@ -323,18 +320,18 @@ export default function AetherArchive() {
         <div className="vhs-filter" />
       </div>
 
-      {/* FALLOUT TERMINAL OVERLAY */}
+      {/* REFINED MONOCHROME TERMINAL OVERLAY */}
       <AnimatePresence>
         {isTerminalActive && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[10000] bg-black p-12 flex flex-col items-center justify-center">
-            <div className="crt-overlay pointer-events-none fixed inset-0" />
-            <div className="w-full max-w-4xl h-[75vh] border border-green-900 bg-[#000d00] p-8 overflow-y-auto text-green-500 shadow-[0_0_35px_rgba(0,120,0,0.2)] terminal-container custom-scrollbar">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[10000] bg-black p-6 md:p-12 flex flex-col items-center justify-center">
+            <div className="terminal-scanline pointer-events-none" />
+            <div className="w-full max-w-4xl h-[75vh] border border-white bg-black p-8 md:p-12 overflow-y-auto terminal-flicker custom-scrollbar relative">
               {isHacking ? (
                 <div className="text-center mt-20">
-                  <p className="mb-10 text-xl glow-text">SECURITY OVERRIDE IN PROGRESS: {hackAttempts} ATTEMPTS LEFT</p>
+                  <p className="mb-10 text-xl font-bold uppercase tracking-widest">SECURITY OVERRIDE: {hackAttempts} ATTEMPTS REMAINING</p>
                   <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
                     {hackWords.map(w => (
-                      <button key={w} onClick={() => handleHackClick(w)} className="border border-green-800 p-4 hover:bg-green-500 hover:text-black transition-all font-bold uppercase tracking-widest clickable">
+                      <button key={w} onClick={() => handleHackClick(w)} className="border border-white/20 p-4 hover:bg-white hover:text-black transition-all font-bold uppercase tracking-widest text-[11px] md:text-xs clickable">
                         {w}
                       </button>
                     ))}
@@ -342,20 +339,20 @@ export default function AetherArchive() {
                 </div>
               ) : (
                 <div className="flex flex-col h-full">
-                  <div className="flex-1 overflow-y-auto pr-4">
+                  <div className="flex-1 overflow-y-auto pr-4 font-mono text-[11px] md:text-xs leading-relaxed uppercase">
                     {terminalHistory.map((line, i) => (
-                      <p key={i} className="mb-1 glow-text leading-tight">{line}</p>
+                      <p key={i} className="mb-2 opacity-80">{line}</p>
                     ))}
                     <div ref={terminalEndRef} />
                   </div>
-                  <form onSubmit={handleTerminalSubmit} className="mt-4 flex border-t border-green-900 pt-6">
-                    <span className="mr-3 animate-pulse text-xl">{">"}</span>
-                    <input autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="bg-transparent border-none outline-none text-green-500 w-full uppercase text-lg" />
+                  <form onSubmit={handleTerminalSubmit} className="mt-4 flex border-t border-white/10 pt-6 items-center">
+                    <span className="mr-3 animate-pulse text-lg">_</span>
+                    <input autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="bg-transparent border-none outline-none text-white w-full uppercase text-xs tracking-widest" />
                   </form>
                 </div>
               )}
             </div>
-            <button onClick={() => setIsTerminalActive(false)} className="mt-8 text-green-900 hover:text-green-500 underline text-xs uppercase tracking-widest clickable">Terminate_Connection</button>
+            <button onClick={() => setIsTerminalActive(false)} className="mt-8 text-white/40 hover:text-white underline text-[10px] uppercase tracking-widest clickable">Terminate_Session</button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -499,11 +496,23 @@ export default function AetherArchive() {
         )}
 
         {isLogsOpen && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1000] bg-black/98 flex items-center justify-center p-6" onClick={() => setIsLogsOpen(false)}>
-            <div className="w-full max-w-3xl border border-white/20 bg-black p-12" onClick={e => e.stopPropagation()}>
-              <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-6 text-xs text-white/50"><Terminal size={16} /> DECRYPTION_LOGS <X className="clickable" onClick={() => setIsLogsOpen(false)} /></div>
-              <div className="space-y-6 text-[12px] max-h-[55vh] overflow-y-auto custom-scrollbar">
-                {logDatabase.map((log, i) => (<p key={i} className={log.type === 'error' ? 'text-red-500' : 'text-white/40'}>{log.text}</p>))}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[1000] bg-black flex items-center justify-center p-6" onClick={() => setIsLogsOpen(false)}>
+            <div className="w-full max-w-3xl border border-white bg-black p-12 relative overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="terminal-scanline pointer-events-none" />
+              <div className="flex justify-between items-center mb-8 border-b border-white pb-6 text-xs text-white uppercase tracking-widest font-bold">
+                <div className="flex items-center gap-3"><Terminal size={16} /> SYSTEM_TERMINAL_v1.0.4</div>
+                <X className="clickable hover:opacity-50" onClick={() => setIsLogsOpen(false)} />
+              </div>
+              <div className="space-y-4 text-[11px] max-h-[55vh] overflow-y-auto custom-scrollbar font-mono leading-relaxed uppercase">
+                {logDatabase.map((log, i) => (
+                  <p key={i} className="text-white border-b border-white/5 pb-2">
+                    <span className="opacity-40 mr-4">[{i.toString().padStart(3, '0')}]</span>
+                    {log.text}
+                  </p>
+                ))}
+              </div>
+              <div className="mt-8 flex items-center gap-2 text-white animate-pulse">
+                <span className="text-[11px]">_</span>
               </div>
             </div>
           </motion.div>
@@ -524,7 +533,7 @@ export default function AetherArchive() {
 
         {selectedImg && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-10" onClick={() => setSelectedImg(null)}>
-            <img src={`/${selectedImg}`} className="max-w-full max-h-full border border-white/10" />
+            <img src={`/${selectedImg}`} className="max-h-full border border-white/10" />
           </motion.div>
         )}
       </AnimatePresence>
