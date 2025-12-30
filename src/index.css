@@ -3,17 +3,10 @@
   |  [!] UNAUTHORIZED SOURCE ACCESS DETECTED                  |
   |  ARCHIVE_TYPE: SORA_LATENT_SPACE_RECOVERY                 |
   |  CORE_ENGINE: D_MARTINEAU_01                              |
-  |                                                           |
-  |  Warning: Looking too closely at the CSS properties       |
-  |  may cause 'jitter' artifacts in your local vision.       |
   '-----------------------------------------------------------'
 */
 
 @import "tailwindcss";
-
-/** * [SOURCE_CSS_HIDDEN_MESSAGE]: 
- * Extraction is impossible. He is bound to the pixel. 
- */
 
 * { cursor: none !important; }
 
@@ -45,7 +38,9 @@ html, body {
 .jitter-redacted { color: #ff0000 !important; text-shadow: 4px 0 #ff0000, -4px 0 #ff0000; animation: jitter 0.05s infinite; }
 @keyframes jitter { 
   0% { transform: translate(-2px, 1px); } 
-  50% { transform: translate(2px, -1px); } 
+  25% { transform: translate(2px, -1px); }
+  50% { transform: translate(-1px, 2px); }
+  75% { transform: translate(1px, -2px); }
   100% { transform: translate(0px, 0px); } 
 }
 
@@ -69,13 +64,18 @@ html, body {
   100% { transform: translate(1px, -1px) rotate(1deg); }
 }
 
-.system-wipe { 
-  filter: brightness(0) invert(1) !important; 
-  background-color: white !important; 
-  transition: all 0.2s ease-in;
-}
+.system-wipe { filter: brightness(0) invert(1) !important; background-color: white !important; transition: all 0.2s ease-in; }
 
-/* --- DATA LEAK LAYER --- */
+/* --- TERMINAL OVERLAY --- */
+.crt-overlay {
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 3px, 3px 100%; pointer-events: none; box-shadow: inset 0 0 150px rgba(0,0,0,0.8);
+}
+.glow-text { text-shadow: 0 0 8px rgba(0, 255, 0, 0.6); }
+.terminal-container { animation: terminal-flicker 0.15s infinite; }
+@keyframes terminal-flicker { 0% { opacity: 0.99; } 100% { opacity: 1; } }
+
+/* --- DATA LEAK & VHS --- */
 .data-leak-bg {
   position: fixed; inset: 0; z-index: 40; pointer-events: none;
   animation: slide-up 8s linear infinite;
@@ -83,7 +83,6 @@ html, body {
 }
 @keyframes slide-up { from { background-position: 0 0; } to { background-position: 0 -100px; } }
 
-/* --- ATMOSPHERE & VHS --- */
 .vhs-filter {
   position: fixed; inset: 0;
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
